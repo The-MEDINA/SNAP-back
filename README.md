@@ -1,9 +1,9 @@
-Hello chat
+Hello chat!
 
  o
 /|\
  A
 
 Hello
-
 yomama
+Hello
