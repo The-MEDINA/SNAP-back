@@ -1,1 +1,5 @@
 Hello chat
+
+ o
+/|\
+ A
