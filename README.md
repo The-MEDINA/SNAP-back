@@ -1,4 +1,4 @@
-Hello chat
+Hello chat!
 
 
 
@@ -8,4 +8,6 @@ HI- Dinson
 /|\
  A
 
+Hello
+yomama
 Hello
