@@ -1,4 +1,4 @@
-Hello chat
+Hello chat!
 
  o
 /|\
