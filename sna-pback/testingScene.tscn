@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://dmdkhmvoemnk2"]
+
+[node name="Node3D" type="Node3D" unique_id=1430468255]
+
+[node name="HingeJoint3D" type="HingeJoint3D" parent="." unique_id=1693747313]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1199617, 0.21348107, -0.08750939)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=240095233]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1199617, 0.21348107, -0.08750939)
+size = Vector3(1.6114502, 1, 1)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="." unique_id=1620040203]
