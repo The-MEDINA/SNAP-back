@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://canlw72q1pqdt"]
+
+[ext_resource type="PackedScene" uid="uid://k2053enpay7r" path="res://Character/Bottom.tscn" id="1_tai1n"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tai1n"]
+size = Vector3(7.779541, 1, 4.5273438)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_nmfcv"]
+
+[node name="CharacterPrototype" type="Node3D" unique_id=478308979]
+
+[node name="Bottom" parent="." unique_id=811383252 instance=ExtResource("1_tai1n")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1662499288]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.619222, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1983367671]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35119498, 0)
+shape = SubResource("BoxShape3D_tai1n")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=533867548]
+transform = Transform3D(3.8729856, 0, 0, 0, 1, 0, 0, 0, 2.2399645, 0, 0, 0)
+layers = 2
+mesh = SubResource("PlaneMesh_nmfcv")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=2105630920]
+transform = Transform3D(1, 0, 0, 0, 0.8434434, 0.53721803, 0, -0.53721803, 0.8434434, 0, 0.39587104, 2.0505838)
+
+[node name="RimLight" type="AreaLight3D" parent="." unique_id=1748358207]
+transform = Transform3D(-0.8423944, -0.13556771, -0.5215296, -0.011225865, 0.9720411, -0.23454238, 0.53874457, -0.19172256, -0.8203638, -1.230411, -1.2692876, -1.8037711)
+light_energy = 2.0
+light_cull_mask = 4294967293
+
+[node name="FillLight" type="AreaLight3D" parent="." unique_id=2027798813]
+transform = Transform3D(0.7438535, 0.6246871, -0.23758785, -0.3065101, 0.6347569, 0.7093202, 0.59391373, -0.4548072, 0.66363907, -0.6493573, 0.44408208, 0.96562314)
+light_energy = 0.465
+shadow_enabled = true
+
+[node name="KeyLight" type="AreaLight3D" parent="." unique_id=1354767526]
+transform = Transform3D(0.099182636, 0.26018825, 0.96045035, -0.97518677, 0.21739995, 0.04181026, -0.19792332, -0.9407653, 0.27529442, 4.270453, -0.24705529, 0.46379066)
+light_energy = 5.139
+shadow_enabled = true
