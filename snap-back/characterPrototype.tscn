@@ -35,8 +35,10 @@ light_cull_mask = 4294967293
 transform = Transform3D(0.7438535, 0.6246871, -0.23758785, -0.3065101, 0.6347569, 0.7093202, 0.59391373, -0.4548072, 0.66363907, -0.6493573, 0.44408208, 0.96562314)
 light_energy = 0.465
 shadow_enabled = true
+shadow_blur = 3.0
 
 [node name="KeyLight" type="AreaLight3D" parent="." unique_id=1354767526]
 transform = Transform3D(0.099182636, 0.26018825, 0.96045035, -0.97518677, 0.21739995, 0.04181026, -0.19792332, -0.9407653, 0.27529442, 4.270453, -0.24705529, 0.46379066)
 light_energy = 5.139
 shadow_enabled = true
+shadow_blur = 0.5
