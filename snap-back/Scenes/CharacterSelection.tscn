@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://cg428p35w5yyh"]
+
+[ext_resource type="Script" uid="uid://bpbndav6i0rmi" path="res://Scenes/button_manager.gd" id="1_ejqe8"]
+
+[node name="CharacterSelection" type="Control" unique_id=1551737255]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button Manager" type="Control" parent="." unique_id=921522671]
+anchors_preset = 0
+offset_left = 89.0
+offset_top = 57.0
+offset_right = 443.0
+offset_bottom = 338.0
+script = ExtResource("1_ejqe8")
+
+[node name="Button" type="Button" parent="Button Manager" unique_id=810112005]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 72.0
+offset_right = 245.0
+offset_bottom = 211.0
+text = "Select"
+
+[connection signal="pressed" from="Button Manager/Button" to="Button Manager" method="_on_button_pressed"]
