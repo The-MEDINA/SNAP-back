@@ -1,29 +1,49 @@
 [gd_scene format=3 uid="uid://cg428p35w5yyh"]
 
-[ext_resource type="Script" uid="uid://bpbndav6i0rmi" path="res://Scenes/button_manager.gd" id="1_ejqe8"]
-
 [node name="CharacterSelection" type="Control" unique_id=1551737255]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = -467.0
+offset_bottom = -279.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Button Manager" type="Control" parent="." unique_id=921522671]
-anchors_preset = 0
-offset_left = 89.0
-offset_top = 57.0
-offset_right = 443.0
-offset_bottom = 338.0
-script = ExtResource("1_ejqe8")
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=973122732]
+layout_mode = 1
+anchors_preset = -1
+offset_right = 1152.0
+offset_bottom = 647.0
 
-[node name="Button" type="Button" parent="Button Manager" unique_id=810112005]
-layout_mode = 0
-offset_left = 88.0
-offset_top = 72.0
-offset_right = 245.0
-offset_bottom = 211.0
-text = "Select"
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=1347010449]
+layout_mode = 2
 
-[connection signal="pressed" from="Button Manager/Button" to="Button Manager" method="_on_button_pressed"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=499484419]
+layout_mode = 2
+
+[node name="PreviousBtn" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=767940522]
+layout_mode = 2
+text = "<"
+
+[node name="DisplayVBox" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1184417922]
+layout_mode = 2
+
+[node name="CharcterTexture" type="TextureRect" parent="PanelContainer/VBoxContainer/HBoxContainer/DisplayVBox" unique_id=390576847]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer/DisplayVBox" unique_id=1717736510]
+layout_mode = 2
+
+[node name="RoleLabel" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer/DisplayVBox" unique_id=1147773128]
+layout_mode = 2
+
+[node name="NextBtn" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1003212149]
+layout_mode = 2
+text = ">"
+
+[node name="LockInBtn" type="Button" parent="PanelContainer/VBoxContainer" unique_id=1178217051]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1262838331]
+layout_mode = 2
