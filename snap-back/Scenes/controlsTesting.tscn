@@ -1,35 +1,40 @@
 [gd_scene format=3 uid="uid://df2odcgu3122d"]
 
+[ext_resource type="Script" uid="uid://cgsidc77wnwmg" path="res://Scripts/cameraController.gd" id="1_n7tqr"]
 [ext_resource type="Script" uid="uid://cbgw1kae8a2b" path="res://Scripts/limb.gd" id="1_r4tmq"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_u1c42"]
 
 [node name="ControlsTesting" type="Node3D" unique_id=1011487555]
 
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1019244076]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1019244076 node_paths=PackedStringArray("object1", "object2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35800695, 0.996895)
+fov = 50.0
+script = ExtResource("1_n7tqr")
+object1 = NodePath("../Limb")
+object2 = NodePath("../Limb6")
 
 [node name="Limb" type="MeshInstance3D" parent="." unique_id=419198381]
-transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, -0.59975713, 0.35, 0)
+transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, -1.5990775, 0.35, -1.586439)
 mesh = SubResource("BoxMesh_u1c42")
 script = ExtResource("1_r4tmq")
 baseDirection = Vector3(-0.25, -1.01, 0)
 
 [node name="Limb2" type="MeshInstance3D" parent="." unique_id=2119752659]
-transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, -0.4997571, 0.35, 0)
+transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, -1.4990773, 0.35, -1.586439)
 mesh = SubResource("BoxMesh_u1c42")
 script = ExtResource("1_r4tmq")
 left = false
 baseDirection = Vector3(0.25, -1.01, 0)
 
 [node name="Limb3" type="MeshInstance3D" parent="." unique_id=209792086]
-transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, -0.59975713, 0.65, 0)
+transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, -1.5990775, 0.65, -1.586439)
 mesh = SubResource("BoxMesh_u1c42")
 script = ExtResource("1_r4tmq")
 baseDirection = Vector3(-1.01, -0.25, 0)
 
 [node name="Limb4" type="MeshInstance3D" parent="." unique_id=411923115]
-transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, -0.4997571, 0.6503435, 0)
+transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, -1.4990773, 0.6503435, -1.586439)
 mesh = SubResource("BoxMesh_u1c42")
 script = ExtResource("1_r4tmq")
 left = false
