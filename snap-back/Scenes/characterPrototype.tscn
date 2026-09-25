@@ -13,14 +13,15 @@ size = Vector3(7.779541, 1, 4.5273438)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1662499288]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.619222, 0)
+collision_layer = 7
+collision_mask = 7
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1983367671]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35119498, 0)
 shape = SubResource("BoxShape3D_tai1n")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=533867548]
-transform = Transform3D(3.8729856, 0, 0, 0, 1, 0, 0, 0, 2.2399645, 0, 0, 0)
-layers = 2
+transform = Transform3D(3.8729856, 0, 0, 0, 1, 0, 0, 0, 2.2399645, -0.013361692, -0.03812933, 0.013332367)
 mesh = SubResource("PlaneMesh_nmfcv")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=2105630920]
