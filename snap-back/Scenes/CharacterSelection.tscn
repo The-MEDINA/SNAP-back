@@ -1,49 +1,136 @@
 [gd_scene format=3 uid="uid://cg428p35w5yyh"]
 
-[node name="CharacterSelection" type="Control" unique_id=1551737255]
+[ext_resource type="Script" uid="uid://bpbndav6i0rmi" path="res://Scenes/button_manager.gd" id="1_ejqe8"]
+
+[node name="CharacterSelect" type="Control" unique_id=480896808 node_paths=PackedStringArray("top_mesh_node", "bottom_mesh_node")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = -467.0
-offset_bottom = -279.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ejqe8")
+top_mesh_node = NodePath("MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Skeleton3D/MeshInstance3D")
+bottom_mesh_node = NodePath("MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Skeleton3D/MeshInstance3D2")
+
+[node name="MainHBoxContainer" type="HBoxContainer" parent="." unique_id=1870354763]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="." unique_id=973122732]
-layout_mode = 1
-anchors_preset = -1
-offset_right = 1152.0
-offset_bottom = 647.0
+[node name="PanelContainer" type="PanelContainer" parent="MainHBoxContainer" unique_id=475021622]
+layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=1347010449]
+[node name="MarginContainer" type="MarginContainer" parent="MainHBoxContainer/PanelContainer" unique_id=307594341]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=499484419]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainHBoxContainer/PanelContainer/MarginContainer" unique_id=819550477]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Top" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=233345948]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Top"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=183221713]
 layout_mode = 2
 
-[node name="PreviousBtn" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=767940522]
+[node name="TopPrevBtn" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1572036947]
 layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
 text = "<"
 
-[node name="DisplayVBox" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1184417922]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1463362285]
 layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
 
-[node name="CharcterTexture" type="TextureRect" parent="PanelContainer/VBoxContainer/HBoxContainer/DisplayVBox" unique_id=390576847]
+[node name="TopNameLabel" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=981552109]
 layout_mode = 2
+text = "Name"
 
-[node name="Name" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer/DisplayVBox" unique_id=1717736510]
+[node name="TopRoleLabel" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=493588580]
 layout_mode = 2
+text = "Role"
 
-[node name="RoleLabel" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer/DisplayVBox" unique_id=1147773128]
+[node name="TopNextBtn" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=66782738]
 layout_mode = 2
-
-[node name="NextBtn" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1003212149]
-layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = ">"
 
-[node name="LockInBtn" type="Button" parent="PanelContainer/VBoxContainer" unique_id=1178217051]
+[node name="TopLockInButton" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=5843294]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Lock In
+"
+
+[node name="Bottom" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=2107551480]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Bottom"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=107434215]
 layout_mode = 2
 
-[node name="StatusLabel" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1262838331]
+[node name="BottomPrevBtn" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1198520786]
 layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+text = "<"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=520748911]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+
+[node name="BottomNameLabel" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2/VBoxContainer" unique_id=1254839490]
+layout_mode = 2
+text = "Name"
+
+[node name="BottomRoleLabel" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2/VBoxContainer" unique_id=1149499393]
+layout_mode = 2
+text = "Role"
+
+[node name="BottomNextBtn" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1167250052]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = ">"
+
+[node name="BottomLockInButton" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=2012523151]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Lock In
+"
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="MainHBoxContainer" unique_id=301152440]
+layout_mode = 2
+size_flags_horizontal = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="MainHBoxContainer/SubViewportContainer" unique_id=1816881582]
+size = Vector2i(574, 648)
+
+[node name="Camera3D" type="Camera3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport" unique_id=147444632]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 3)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport" unique_id=962340239]
+
+[node name="Node3D" type="Node3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport" unique_id=1337370511]
+
+[node name="Skeleton3D" type="Skeleton3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport/Node3D" unique_id=756477417]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Skeleton3D" unique_id=1109766035]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Skeleton3D" unique_id=742495059]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
