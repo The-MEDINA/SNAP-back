@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://canlw72q1pqdt"]
 
-[ext_resource type="PackedScene" uid="uid://k2053enpay7r" path="res://Character/Bottom.tscn" id="1_tai1n"]
+[ext_resource type="PackedScene" uid="uid://b4rd8a8jyeqrj" path="res://Character/bottom_1.tscn" id="1_xxusg"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tai1n"]
 size = Vector3(7.779541, 1, 4.5273438)
@@ -9,7 +9,11 @@ size = Vector3(7.779541, 1, 4.5273438)
 
 [node name="CharacterPrototype" type="Node3D" unique_id=478308979]
 
-[node name="Bottom" parent="." unique_id=811383252 instance=ExtResource("1_tai1n")]
+[node name="Bottom2" parent="." unique_id=623702786 instance=ExtResource("1_xxusg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.89690804, -0.052509904, 0)
+
+[node name="Bottom4" parent="." unique_id=1087902909 instance=ExtResource("1_xxusg")]
+transform = Transform3D(-0.99999994, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -0.99999994, 0.89690804, 2.0920725, 0.14767367)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1662499288]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.619222, 0)
