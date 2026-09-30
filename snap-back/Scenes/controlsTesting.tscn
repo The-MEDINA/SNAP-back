@@ -2,8 +2,15 @@
 
 [ext_resource type="Script" uid="uid://cgsidc77wnwmg" path="res://Scripts/cameraController.gd" id="1_n7tqr"]
 [ext_resource type="Script" uid="uid://cbgw1kae8a2b" path="res://Scripts/limb.gd" id="1_r4tmq"]
+[ext_resource type="Script" uid="uid://duo3ymjn1k4ox" path="res://Scripts/testCharacter.gd" id="3_nw5g6"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_u1c42"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_5f8x6"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_5f8x6"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_32bnj"]
 
 [node name="ControlsTesting" type="Node3D" unique_id=1011487555]
 
@@ -11,61 +18,47 @@
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35800695, 0.996895)
 fov = 50.0
 script = ExtResource("1_n7tqr")
-object1 = NodePath("../Limb")
-object2 = NodePath("../Limb6")
+object1 = NodePath("../TestCharacter1")
+object2 = NodePath("../TestCharacter2")
 
 [node name="Limb" type="MeshInstance3D" parent="." unique_id=419198381]
-transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, -1.5990775, 0.35, -1.586439)
+transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, 0.5843823, 0.35, -1.0211128)
 mesh = SubResource("BoxMesh_u1c42")
 script = ExtResource("1_r4tmq")
 baseDirection = Vector3(-0.25, -1.01, 0)
 
 [node name="Limb2" type="MeshInstance3D" parent="." unique_id=2119752659]
-transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, -1.4990773, 0.35, -1.586439)
+transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, 0.68438244, 0.35, -1.0211128)
 mesh = SubResource("BoxMesh_u1c42")
 script = ExtResource("1_r4tmq")
 left = false
 baseDirection = Vector3(0.25, -1.01, 0)
 
 [node name="Limb3" type="MeshInstance3D" parent="." unique_id=209792086]
-transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, -1.5990775, 0.65, -1.586439)
+transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, 0.5843823, 0.65, -1.0211128)
 mesh = SubResource("BoxMesh_u1c42")
 script = ExtResource("1_r4tmq")
 baseDirection = Vector3(-1.01, -0.25, 0)
 
 [node name="Limb4" type="MeshInstance3D" parent="." unique_id=411923115]
-transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, -1.4990773, 0.6503435, -1.586439)
+transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, 0.68438244, 0.6503435, -1.0211128)
 mesh = SubResource("BoxMesh_u1c42")
 script = ExtResource("1_r4tmq")
 left = false
 baseDirection = Vector3(1.01, -0.25, 0)
 
-[node name="Limb5" type="MeshInstance3D" parent="." unique_id=213305711]
-transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, 0.49948034, 0.35, 0)
-mesh = SubResource("BoxMesh_u1c42")
-script = ExtResource("1_r4tmq")
-baseDirection = Vector3(-0.25, -1.01, 0)
-lowBase = true
+[node name="TestCharacter1" type="MeshInstance3D" parent="." unique_id=1506427710]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0600567, 0, 0)
+mesh = SubResource("SphereMesh_5f8x6")
+script = ExtResource("3_nw5g6")
 
-[node name="Limb6" type="MeshInstance3D" parent="." unique_id=1931734559]
-transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, 0.5994804, 0.35, 0)
-mesh = SubResource("BoxMesh_u1c42")
-script = ExtResource("1_r4tmq")
+[node name="TestCharacter2" type="MeshInstance3D" parent="." unique_id=734844809]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8996856, 0, 0)
+mesh = SubResource("BoxMesh_5f8x6")
+script = ExtResource("3_nw5g6")
 left = false
-baseDirection = Vector3(0.25, -1.01, 0)
-lowBase = true
 
-[node name="Limb7" type="MeshInstance3D" parent="." unique_id=383700691]
-transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, 0.49948034, 0.65, 0)
-mesh = SubResource("BoxMesh_u1c42")
-script = ExtResource("1_r4tmq")
-baseDirection = Vector3(-1.01, -0.25, 0)
-lowBase = true
-
-[node name="Limb8" type="MeshInstance3D" parent="." unique_id=1703023124]
-transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, 0.5994804, 0.65, 0)
-mesh = SubResource("BoxMesh_u1c42")
-script = ExtResource("1_r4tmq")
-left = false
-baseDirection = Vector3(1.01, -0.25, 0)
-lowBase = true
+[node name="CameraBounds" type="MeshInstance3D" parent="." unique_id=635781397]
+transform = Transform3D(16.623348, 0, 0, 0, 8.798147, 0, 0, 0, 16.868547, 0, 0, 0)
+layers = 0
+mesh = SubResource("BoxMesh_32bnj")
