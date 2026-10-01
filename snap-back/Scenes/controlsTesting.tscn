@@ -14,12 +14,13 @@
 
 [node name="ControlsTesting" type="Node3D" unique_id=1011487555]
 
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1019244076 node_paths=PackedStringArray("object1", "object2")]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1019244076 node_paths=PackedStringArray("object1", "object2", "cameraBounds")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35800695, 0.996895)
 fov = 50.0
 script = ExtResource("1_n7tqr")
 object1 = NodePath("../TestCharacter1")
 object2 = NodePath("../TestCharacter2")
+cameraBounds = NodePath("../CameraBounds")
 
 [node name="Limb" type="MeshInstance3D" parent="." unique_id=419198381]
 transform = Transform3D(0.1, 0, 0, 0, 0.5, 0, 0, 0, 0.1, 0.5843823, 0.35, -1.0211128)
