@@ -121,7 +121,7 @@ func _playerDown(delta: float) -> void:
 			player1Win = false
 			currentState = GameState.GAME_OVER
 			return
-		print('Player 1 timer: ' + str(snappedf(player1Timer, 0.1)) + '(Outs: ' + str(player1Outs) + ')')
+		print('Player 1 timer: ' + str(snappedf(player1Timer, 0.1)) + ' (Outs: ' + str(player1Outs) + ')')
 		return
 	# Player 2 timer
 	if player2Down:
@@ -133,7 +133,7 @@ func _playerDown(delta: float) -> void:
 			player1Win = true
 			currentState = GameState.GAME_OVER
 			return
-		print('Player 2 timer: ' + str(snappedf(player2Timer, 0.1)) + '(Outs: ' + str(player2Outs) + ')')
+		print('Player 2 timer: ' + str(snappedf(player2Timer, 0.1)) + ' (Outs: ' + str(player2Outs) + ')')
 		return
 	# Nobody is down, add out to last player to reconnect. If both players reconnect on the same frame, no outs are added. Then resume game
 	if lastPlayerDown == 1:
