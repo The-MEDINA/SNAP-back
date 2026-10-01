@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://df2odcgu3122d"]
 
+[ext_resource type="Script" uid="uid://bkj4gqnxp8h6h" path="res://Scripts/gameStateMachine.gd" id="1_m2lay"]
 [ext_resource type="Script" uid="uid://cgsidc77wnwmg" path="res://Scripts/cameraController.gd" id="1_n7tqr"]
 [ext_resource type="Script" uid="uid://cbgw1kae8a2b" path="res://Scripts/limb.gd" id="1_r4tmq"]
 [ext_resource type="Script" uid="uid://duo3ymjn1k4ox" path="res://Scripts/testCharacter.gd" id="3_nw5g6"]
@@ -13,6 +14,7 @@
 [sub_resource type="BoxMesh" id="BoxMesh_32bnj"]
 
 [node name="ControlsTesting" type="Node3D" unique_id=1011487555]
+script = ExtResource("1_m2lay")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1019244076 node_paths=PackedStringArray("object1", "object2", "cameraBounds")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35800695, 0.996895)
