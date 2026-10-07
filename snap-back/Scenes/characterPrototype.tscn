@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cfu1b0fs0y1b4" path="res://Scripts/characterController.gd" id="1_53enj"]
 [ext_resource type="PackedScene" uid="uid://b4rd8a8jyeqrj" path="res://Character/bottom_1.tscn" id="1_xxusg"]
+[ext_resource type="PackedScene" uid="uid://bh6a3dx6tk8on" path="res://Character/top.tscn" id="3_53enj"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tai1n"]
 size = Vector3(7.779541, 1, 4.5273438)
@@ -66,3 +67,12 @@ transform = Transform3D(0.099182636, 0.26018825, 0.96045035, -0.97518677, 0.2173
 light_energy = 5.139
 shadow_enabled = true
 shadow_blur = 0.5
+
+[node name="Top2" parent="." unique_id=1504632149 instance=ExtResource("3_53enj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2170405, -0.8444228, -0.004642725)
+
+[node name="Top3" parent="." unique_id=316937011 instance=ExtResource("3_53enj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.21704054, -0.8444228, -0.004642725)
+
+[node name="Top4" parent="." unique_id=1394867766 instance=ExtResource("3_53enj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5915212, -0.8444228, 0.7164042)
