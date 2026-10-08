@@ -41,9 +41,11 @@ transform = Transform3D(16.623348, 0, 0, 0, 8.798147, 0, 0, 0, 16.868547, 0, 0, 
 layers = 0
 mesh = SubResource("BoxMesh_32bnj")
 
-[node name="Character" type="Node3D" parent="." unique_id=2122778959]
+[node name="Character" type="Node3D" parent="." unique_id=2122778959 node_paths=PackedStringArray("otherPlayerTop", "otherPlayerBottom")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.187875, 2.0047445, 0)
 script = ExtResource("3_gg4yg")
+otherPlayerTop = NodePath("../TestCharacter2")
+otherPlayerBottom = NodePath("../TestCharacter2")
 
 [node name="Bottom" parent="Character" unique_id=623702786 instance=ExtResource("4_gg4yg")]
 
