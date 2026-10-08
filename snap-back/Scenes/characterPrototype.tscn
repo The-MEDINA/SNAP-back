@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://canlw72q1pqdt"]
 
-[ext_resource type="Script" uid="uid://cfu1b0fs0y1b4" path="res://Scripts/characterController.gd" id="1_53enj"]
 [ext_resource type="PackedScene" uid="uid://b4rd8a8jyeqrj" path="res://Character/bottom_1.tscn" id="1_xxusg"]
 [ext_resource type="PackedScene" uid="uid://bh6a3dx6tk8on" path="res://Character/top.tscn" id="3_53enj"]
 
@@ -9,9 +8,7 @@ size = Vector3(7.779541, 1, 4.5273438)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_nmfcv"]
 
-[node name="CharacterPrototype" type="Node3D" unique_id=478308979 node_paths=PackedStringArray("body")]
-script = ExtResource("1_53enj")
-body = NodePath("Bottom2")
+[node name="CharacterPrototype" type="Node3D" unique_id=478308979]
 
 [node name="Bottom2" parent="." unique_id=623702786 instance=ExtResource("1_xxusg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17979145, 1.0486263, 0)

@@ -1,12 +1,11 @@
 extends Node
 
-@export var body: Node
 var boneSim: PhysicalBoneSimulator3D
 var leftThigh: PhysicalBone3D
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	boneSim = $Bottom2/ArmatureBottom/Skeleton3D/PhysicalBoneSimulator3D
+	var boneSim = get_node(self.name + "/ArmatureBottom/Skeleton3D/PhysicalBoneSimulator3D")
 	leftThigh = boneSim.get_node('Physical Bone ThighL') as PhysicalBone3D
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -3,7 +3,8 @@
 [ext_resource type="Script" uid="uid://bkj4gqnxp8h6h" path="res://Scripts/gameStateMachine.gd" id="1_m2lay"]
 [ext_resource type="Script" uid="uid://cgsidc77wnwmg" path="res://Scripts/cameraController.gd" id="1_n7tqr"]
 [ext_resource type="Script" uid="uid://cbgw1kae8a2b" path="res://Scripts/limb.gd" id="1_r4tmq"]
-[ext_resource type="Script" uid="uid://duo3ymjn1k4ox" path="res://Scripts/testCharacter.gd" id="3_nw5g6"]
+[ext_resource type="PackedScene" uid="uid://b4rd8a8jyeqrj" path="res://Character/bottom_1.tscn" id="4_gg4yg"]
+[ext_resource type="PackedScene" uid="uid://bh6a3dx6tk8on" path="res://Character/top.tscn" id="5_6tqc2"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_u1c42"]
 
@@ -12,6 +13,11 @@
 [sub_resource type="BoxMesh" id="BoxMesh_5f8x6"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_32bnj"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5ti0k"]
+size = Vector3(7.779541, 1, 4.5273438)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_1ohda"]
 
 [node name="ControlsTesting" type="Node3D" unique_id=1011487555]
 script = ExtResource("1_m2lay")
@@ -53,15 +59,34 @@ baseDirection = Vector3(1.01, -0.25, 0)
 [node name="TestCharacter1" type="MeshInstance3D" parent="." unique_id=1506427710]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0600567, 0, 0)
 mesh = SubResource("SphereMesh_5f8x6")
-script = ExtResource("3_nw5g6")
 
 [node name="TestCharacter2" type="MeshInstance3D" parent="." unique_id=734844809]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8996856, 0, 0)
 mesh = SubResource("BoxMesh_5f8x6")
-script = ExtResource("3_nw5g6")
-left = false
 
 [node name="CameraBounds" type="MeshInstance3D" parent="." unique_id=635781397]
 transform = Transform3D(16.623348, 0, 0, 0, 8.798147, 0, 0, 0, 16.868547, 0, 0, 0)
 layers = 0
 mesh = SubResource("BoxMesh_32bnj")
+
+[node name="Character" type="Node3D" parent="." unique_id=2122778959]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.187875, 0, 0)
+
+[node name="Bottom" parent="Character" unique_id=623702786 instance=ExtResource("4_gg4yg")]
+
+[node name="Top" parent="Character" unique_id=1504632149 instance=ExtResource("5_6tqc2")]
+
+[node name="Generic6DOFJoint3D" type="Generic6DOFJoint3D" parent="Character" unique_id=829068928]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=942030583]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.619222, 0)
+collision_layer = 7
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1802266197]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35119498, 0)
+shape = SubResource("BoxShape3D_5ti0k")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=373406836]
+transform = Transform3D(3.8729856, 0, 0, 0, 1, 0, 0, 0, 2.2399645, -0.013361692, -0.03812933, 0.013332367)
+mesh = SubResource("PlaneMesh_1ohda")
