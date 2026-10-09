@@ -6,10 +6,6 @@
 [ext_resource type="PackedScene" uid="uid://b4rd8a8jyeqrj" path="res://Character/bottom_1.tscn" id="4_gg4yg"]
 [ext_resource type="PackedScene" uid="uid://bh6a3dx6tk8on" path="res://Character/top.tscn" id="5_6tqc2"]
 
-[sub_resource type="SphereMesh" id="SphereMesh_5f8x6"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_5f8x6"]
-
 [sub_resource type="BoxMesh" id="BoxMesh_32bnj"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_5ti0k"]
@@ -24,34 +20,30 @@ script = ExtResource("1_m2lay")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35800695, 0.996895)
 fov = 50.0
 script = ExtResource("1_n7tqr")
-object1 = NodePath("../TestCharacter1")
-object2 = NodePath("../TestCharacter2")
+object1 = NodePath("../Character/Top")
+object2 = NodePath("../Character2/Top")
 cameraBounds = NodePath("../CameraBounds")
 
-[node name="TestCharacter1" type="MeshInstance3D" parent="." unique_id=1506427710]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0600567, 0, 0)
-mesh = SubResource("SphereMesh_5f8x6")
-
-[node name="TestCharacter2" type="MeshInstance3D" parent="." unique_id=734844809]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8996856, 0, 0)
-mesh = SubResource("BoxMesh_5f8x6")
-
 [node name="CameraBounds" type="MeshInstance3D" parent="." unique_id=635781397]
-transform = Transform3D(16.623348, 0, 0, 0, 8.798147, 0, 0, 0, 16.868547, 0, 0, 0)
+transform = Transform3D(54.100666, 0, 0, 0, 10.345334, 0, 0, 0, 29.819696, 0, 0, 0)
 layers = 0
 mesh = SubResource("BoxMesh_32bnj")
 
-[node name="Character" type="Node3D" parent="." unique_id=2122778959 node_paths=PackedStringArray("otherPlayerTop", "otherPlayerBottom")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.187875, 2.0047445, 0)
-script = ExtResource("3_gg4yg")
-otherPlayerTop = NodePath("../TestCharacter2")
-otherPlayerBottom = NodePath("../TestCharacter2")
+[node name="RimLight" type="AreaLight3D" parent="." unique_id=58461841]
+light_energy = 2.0
+light_cull_mask = 4294967293
 
-[node name="Bottom" parent="Character" unique_id=623702786 instance=ExtResource("4_gg4yg")]
+[node name="FillLight" type="AreaLight3D" parent="." unique_id=1179843079]
+transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0)
+light_energy = 0.465
+shadow_enabled = true
+shadow_blur = 3.0
 
-[node name="Top" parent="Character" unique_id=1504632149 instance=ExtResource("5_6tqc2")]
-
-[node name="Joint" type="Generic6DOFJoint3D" parent="Character" unique_id=829068928]
+[node name="KeyLight" type="AreaLight3D" parent="." unique_id=1916879357]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.4333236)
+light_energy = 5.139
+shadow_enabled = true
+shadow_blur = 0.5
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=942030583]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.619222, 0)
@@ -66,19 +58,63 @@ shape = SubResource("BoxShape3D_5ti0k")
 transform = Transform3D(3.8729856, 0, 0, 0, 1, 0, 0, 0, 2.2399645, -0.013361692, -0.03812933, 0.013332367)
 mesh = SubResource("PlaneMesh_1ohda")
 
-[node name="RimLight" type="AreaLight3D" parent="." unique_id=58461841]
-transform = Transform3D(-0.8423944, -0.13556771, -0.5215296, -0.011225865, 0.9720411, -0.23454238, 0.53874457, -0.19172256, -0.8203638, -1.230411, -1.2692876, -1.8037711)
-light_energy = 2.0
-light_cull_mask = 4294967293
+[node name="StaticBody3D2" type="StaticBody3D" parent="." unique_id=381036323]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, -4.7683716e-07, 0.49460697, 2.9489372)
+collision_layer = 15
+collision_mask = 7
 
-[node name="FillLight" type="AreaLight3D" parent="." unique_id=1179843079]
-transform = Transform3D(0.7438535, 0.6246871, -0.23758785, -0.3065101, 0.6347569, 0.7093202, 0.59391373, -0.4548072, 0.66363907, -0.6493573, 0.44408208, 0.96562314)
-light_energy = 0.465
-shadow_enabled = true
-shadow_blur = 3.0
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2" unique_id=1754088202]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35119498, 0)
+shape = SubResource("BoxShape3D_5ti0k")
 
-[node name="KeyLight" type="AreaLight3D" parent="." unique_id=1916879357]
-transform = Transform3D(0.099182636, 0.26018825, 0.96045035, -0.97518677, 0.21739995, 0.04181026, -0.19792332, -0.9407653, 0.27529442, 4.270453, -0.24705529, 0.46379066)
-light_energy = 5.139
-shadow_enabled = true
-shadow_blur = 0.5
+[node name="StaticBody3D3" type="StaticBody3D" parent="." unique_id=1245023263]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, -9.536743e-07, 0.6565063, -2.3373337)
+collision_layer = 15
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D3" unique_id=2045210543]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35119498, 0)
+shape = SubResource("BoxShape3D_5ti0k")
+
+[node name="StaticBody3D4" type="StaticBody3D" parent="." unique_id=676244666]
+transform = Transform3D(-4.371139e-08, 1, -4.371139e-08, 0, -4.371139e-08, -1, -1, -4.371139e-08, 1.9106855e-15, 4.725623, 0.41432524, -1.6808273)
+collision_layer = 15
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D4" unique_id=915907452]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35119498, 0)
+shape = SubResource("BoxShape3D_5ti0k")
+
+[node name="StaticBody3D5" type="StaticBody3D" parent="." unique_id=2100206030]
+transform = Transform3D(-4.371139e-08, -1, 0, -4.371139e-08, 1.9106855e-15, -1, 1, -4.371139e-08, -4.371139e-08, -4.6125393, 0.5168539, -0.6601329)
+collision_layer = 15
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D5" unique_id=52274050]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35119498, 0)
+shape = SubResource("BoxShape3D_5ti0k")
+
+[node name="Character" type="Node3D" parent="." unique_id=2122778959 node_paths=PackedStringArray("otherPlayer")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.33509, 0.038232327, 0)
+script = ExtResource("3_gg4yg")
+otherPlayer = NodePath("../Character2")
+
+[node name="Bottom" parent="Character" unique_id=623702786 instance=ExtResource("4_gg4yg")]
+
+[node name="Top" parent="Character" unique_id=1504632149 instance=ExtResource("5_6tqc2")]
+
+[node name="Joint" type="Generic6DOFJoint3D" parent="Character" unique_id=829068928]
+
+[node name="Character2" type="Node3D" parent="." unique_id=2017855393 node_paths=PackedStringArray("otherPlayer")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6124609, 0.02783084, 0)
+script = ExtResource("3_gg4yg")
+topController = 2
+bottomController = 3
+singlePlayer = false
+otherPlayer = NodePath("../Character")
+
+[node name="Bottom" parent="Character2" unique_id=190974490 instance=ExtResource("4_gg4yg")]
+
+[node name="Top" parent="Character2" unique_id=28256667 instance=ExtResource("5_6tqc2")]
+
+[node name="Joint" type="Generic6DOFJoint3D" parent="Character2" unique_id=858979169]

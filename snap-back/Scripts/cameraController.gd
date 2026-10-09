@@ -1,7 +1,7 @@
 extends Node
 
-@export var object1: Node
-@export var object2: Node
+@export var object1: Node3D
+@export var object2: Node3D
 @export var minDistance = 5.0
 @export var cameraBounds: MeshInstance3D
 var camera
@@ -44,4 +44,3 @@ func _process(delta: float) -> void:
 	# Convert back to world space
 	position = cameraBounds.to_global(local_position)
 	camera.global_position = position
-	pass

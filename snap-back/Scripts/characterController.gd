@@ -1,13 +1,18 @@
 extends Node3D
 
 # Physics values
-@export var forearmMovementStrength = 200.0
-@export var calfMovementStrength = 200.0
-@export var heightToRunMaintenance = 0.75
-@export var minHeightToMaintain = 0.35
-@export var heightMaintenanceStrength = 100.0
-@export var uprightMaintenanceStrength = 30.0
-@export var rotationSpeedToOtherPlayer = 0.75
+@export var upperArmMovementStrength = 1.5
+@export var calfMovementStrength = 5.0
+@export var heightToRunMaintenance = 0.83
+@export var uprightMaintenanceStrength = 25.0
+@export var rotationSpeed = 2.5
+@export var rotationDamping = 50.0
+@export var bodyDamping = 0.7
+
+# Controls values
+@export var maxUpperArmControlDistance = 0.3
+@export var maxCalfControlDistance = 0.3
+@export var triggerMaxReduction = 0.5
 
 # Controllers (0 is controller 1, 1 is controller 2, so on)
 @export var topController = 0
@@ -16,12 +21,8 @@ extends Node3D
 @export var singlePlayer = true
 var bumperPrevious: bool
 
-# Controller settings
-@export var triggerMaxReduction = 0.5
-
 # Game variables
-@export var otherPlayerTop: Node3D
-@export var otherPlayerBottom: Node3D
+@export var otherPlayer: Node3D
 
 # Joints
 var joint: Generic6DOFJoint3D
@@ -31,8 +32,20 @@ var topJoint: PhysicalBone3D
 var bottomJoint: PhysicalBone3D
 var rightCalf: PhysicalBone3D
 var leftCalf: PhysicalBone3D
-var rightForearm: PhysicalBone3D
-var leftForearm: PhysicalBone3D
+var rightUpperArm: PhysicalBone3D
+var leftUpperArm: PhysicalBone3D
+
+# Offsets used for base bone positions
+var rightUpperArmOffset: Vector3
+var leftUpperArmOffset: Vector3
+var rightCalfOffset: Vector3
+var leftCalfOffset: Vector3
+
+# Target positions for each limb
+var rightUpperArmTarget: Vector3
+var leftUpperArmTarget: Vector3
+var rightCalfTarget: Vector3
+var leftCalfTarget: Vector3
 
 # Camera for making input relative
 var camera: Camera3D
@@ -52,13 +65,19 @@ func _ready() -> void:
 	# Assign variables
 	rightCalf = bottomBoneSim.get_node('Physical Bone CalfR') as PhysicalBone3D
 	leftCalf = bottomBoneSim.get_node('Physical Bone CalfL') as PhysicalBone3D
-	rightForearm = topBoneSim.get_node('Physical Bone ForearmR') as PhysicalBone3D
-	leftForearm = topBoneSim.get_node('Physical Bone ForearmL') as PhysicalBone3D
+	rightUpperArm = topBoneSim.get_node('Physical Bone UpperArmR') as PhysicalBone3D
+	leftUpperArm = topBoneSim.get_node('Physical Bone UpperArmL') as PhysicalBone3D
+	# Get offsets for limbs (in local space of base joints)
+	rightUpperArmOffset = topJoint.global_transform.basis.inverse() * (rightUpperArm.global_position - topJoint.global_position)
+	leftUpperArmOffset = topJoint.global_transform.basis.inverse() * (leftUpperArm.global_position - topJoint.global_position)
+	rightCalfOffset = bottomJoint.global_transform.basis.inverse() * (rightCalf.global_position - bottomJoint.global_position)
+	leftCalfOffset = bottomJoint.global_transform.basis.inverse() * (leftCalf.global_position - bottomJoint.global_position)
 	# Assign camera
 	camera = get_viewport().get_camera_3d()
 	# Singleplayer setup
 	if singlePlayer:
 		topController = 999
+		print('Controlling bottom')
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -74,9 +93,13 @@ func _physics_process(delta: float) -> void:
 	var result = space.intersect_ray(query)
 	if result:
 		_keepUpright()
-		_keepHeight(result.position.y)
-		_rotateTowardTarget((otherPlayerTop.global_position + otherPlayerBottom.global_position) / 2.0)
-	_handlePlayerInput(delta)
+		_reduceMovement()
+		_handlePlayerInput(delta, true)
+		_rotateTowardTarget(otherPlayer.global_position, delta)
+	else:
+		_handlePlayerInput(delta, false)
+	# Update parent
+	global_position = (bottomJoint.global_position + topJoint.global_position) / 2.0
 
 # Keep the body upright
 func _keepUpright() -> void:
@@ -96,65 +119,67 @@ func _keepUpright() -> void:
 	topJoint.angular_velocity += correction
 	bottomJoint.angular_velocity -= correction
 
-# Keep the body (somewhat) off of the floor
-func _keepHeight(floor: float) -> void:
-	# Get height to maintain
-	var heightToMaintain = ((bottomJoint.global_position.y - leftCalf.global_position.y) + (bottomJoint.global_position.y - rightCalf.global_position.y)) / 2.0
-	heightToMaintain = clamp(heightToMaintain, minHeightToMaintain, heightToRunMaintenance)
-	# Get ideal height and see if the pelvis is below that height
-	var desired_height = floor + heightToMaintain
-	if bottomJoint.global_position.y < desired_height:
-		# If below that height, apply velocity to correct for difference in height
-		var error = desired_height - bottomJoint.global_position.y
-		bottomJoint.linear_velocity.y += error * heightMaintenanceStrength
+# Reduce movement to make player slide less
+func _reduceMovement() -> void:
+	topJoint.linear_velocity *= bodyDamping
+	bottomJoint.linear_velocity *= bodyDamping
 
-# Rotate toward the target Vector3
-func _rotateTowardTarget(target: Vector3) -> void:
-	# Get direction to target, ensure it isn't length 0 when Y is removed
-	var direction = target - global_position
-	direction.y = 0.0
-	if direction.length_squared() == 0.0:
+# Rotate parent toward the target Vector3
+func _rotateTowardTarget(target: Vector3, delta: float) -> void:
+	# Get target direction
+	var targetDirection = target - global_position
+	targetDirection.y = 0
+	if targetDirection.length_squared() == 0.0:
 		return
-	direction = direction.normalized()
-	# Get forward, same check
-	var forward = topJoint.global_transform.basis.z
-	forward.y = 0.0
-	if forward.length_squared() == 0.0:
-		return
-	forward = forward.normalized()
-	# Signed angle around Y
-	var angle = atan2(forward.cross(direction).y, forward.dot(direction))
+	targetDirection = targetDirection.normalized()
+	# Forward direction, axis and angle
+	var forward = bottomJoint.global_transform.basis.z.normalized()
+	forward.y = 0
 	var axis = Vector3.UP
-	var correction = axis * angle * rotationSpeedToOtherPlayer
-	topJoint.angular_velocity += correction
-	bottomJoint.angular_velocity -= correction
+	var angle = atan2(forward.cross(targetDirection).y, forward.dot(targetDirection))
+	var correction = angle * rotationSpeed
+	# Rotate torso, apply oppsoite rotation to pelvis to avoid spinning forever
+	# Add rotational velocity
+	topJoint.angular_velocity += axis * correction
+	# Remove rotational velocity to prevent too much spinning
+	topJoint.angular_velocity -= axis * topJoint.angular_velocity.y * rotationDamping * delta
 
-func _handlePlayerInput(delta: float) -> void:
+func _handlePlayerInput(delta: float, grounded: bool) -> void:
 	# Read thumbstick inputs
 	var topRightThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
 	var topLeftThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
-	var bottomRightThumbstick = Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
-	var bottomLeftThumbstick = Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
+	var bottomRightThumbstick = Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_Y))
+	var bottomLeftThumbstick = Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_Y))
 	# Turn thumbsticks into relative Vector3s to use on body
-	var rightForearmInput = _makeRelativeToCamera(topRightThumbstick)
-	var leftForearmInput = _makeRelativeToCamera(topLeftThumbstick)
+	var rightUpperArmInput = _makeRelativeToCamera(topRightThumbstick)
+	var leftUpperArmInput = _makeRelativeToCamera(topLeftThumbstick)
 	var rightCalfInput = _makeRelativeToCamera(bottomRightThumbstick)
 	var leftCalfInput = _makeRelativeToCamera(bottomLeftThumbstick)
 	# Read trigger values
-	var topLeftTrigger = Input.get_joy_axis(topController, JOY_AXIS_TRIGGER_LEFT)
 	var topRightTrigger = Input.get_joy_axis(topController, JOY_AXIS_TRIGGER_RIGHT)
-	var bottomLeftTrigger = Input.get_joy_axis(bottomController, JOY_AXIS_TRIGGER_LEFT)
+	var topLeftTrigger = Input.get_joy_axis(topController, JOY_AXIS_TRIGGER_LEFT)
 	var bottomRightTrigger = Input.get_joy_axis(bottomController, JOY_AXIS_TRIGGER_RIGHT)
+	var bottomLeftTrigger = Input.get_joy_axis(bottomController, JOY_AXIS_TRIGGER_LEFT)
 	# Apply triggers to weaken inputs
-	rightForearmInput -= rightForearmInput * topRightTrigger * triggerMaxReduction
-	leftForearmInput -= leftForearmInput * topLeftTrigger * triggerMaxReduction
+	rightUpperArmInput -= rightUpperArmInput * topRightTrigger * triggerMaxReduction
+	leftUpperArmInput -= leftUpperArmInput * topLeftTrigger * triggerMaxReduction
 	rightCalfInput -= rightCalfInput * bottomRightTrigger * triggerMaxReduction
 	leftCalfInput -= leftCalfInput * bottomLeftTrigger * triggerMaxReduction
-	# Move limbs
-	rightForearm.angular_velocity += rightForearmInput * forearmMovementStrength
-	leftForearm.angular_velocity += leftForearmInput * forearmMovementStrength
-	rightCalf.angular_velocity += rightCalfInput * calfMovementStrength
-	leftCalf.angular_velocity += leftCalfInput * calfMovementStrength
+	# Get target positions for limbs
+	rightUpperArmTarget = _makeRelativeToBase(topJoint, rightUpperArmOffset) + rightUpperArmInput * maxUpperArmControlDistance
+	leftUpperArmTarget = _makeRelativeToBase(topJoint, leftUpperArmOffset) + leftUpperArmInput * maxUpperArmControlDistance
+	rightCalfTarget = _makeRelativeToBase(bottomJoint, rightCalfOffset) + rightCalfInput * maxUpperArmControlDistance
+	leftCalfTarget = _makeRelativeToBase(bottomJoint, leftCalfOffset) + leftCalfInput * maxUpperArmControlDistance
+	# Apply velocity to get limbs to target positions
+	rightUpperArm.linear_velocity += _getVelocityToTarget(rightUpperArm.global_position, rightUpperArmTarget, upperArmMovementStrength)
+	leftUpperArm.linear_velocity += _getVelocityToTarget(leftUpperArm.global_position, leftUpperArmTarget, upperArmMovementStrength)
+	var rightCalfVelocity = _getVelocityToTarget(rightCalf.global_position, rightCalfTarget, calfMovementStrength)
+	rightCalf.linear_velocity += rightCalfVelocity
+	var leftCalfVelocity = _getVelocityToTarget(leftCalf.global_position, leftCalfTarget, calfMovementStrength)
+	leftCalf.linear_velocity += leftCalfVelocity
+	# If grounded, apply opposite of calf velocity average multipled by movement strength
+	if grounded:
+		bottomJoint.linear_velocity -= (rightCalfVelocity + leftCalfVelocity) / 2 * calfMovementStrength
 	# If single player and button pressed, swap controlled half of body
 	if singlePlayer:
 		var bumper = Input.is_joy_button_pressed(bottomController if bottomController != 999 else topController, JOY_BUTTON_RIGHT_SHOULDER)
@@ -162,15 +187,24 @@ func _handlePlayerInput(delta: float) -> void:
 			if bottomController == 999:
 				bottomController = topController
 				topController = 999
+				print('Controlling bottom')
 			else:
 				topController = bottomController
 				bottomController = 999
+				print('Controlling top')
 		bumperPrevious = bumper 
-		
+
+# Apply a saved offset, accounting for rotation
+func _makeRelativeToBase(baseJoint: PhysicalBone3D, offset: Vector3) -> Vector3:
+	return baseJoint.global_position + (baseJoint.global_transform.basis * offset)
+
+func _getVelocityToTarget(currentPosition: Vector3, targetPosition: Vector3, movementStrength: float) -> Vector3:
+	return (targetPosition - currentPosition) * movementStrength
+
 # Make a Vector2 thumbstick input relative to the camera in world space
 func _makeRelativeToCamera(input: Vector2) -> Vector3:
 	# Get right direction of camera (basis is a 3x3 matrix containing local axes)
-	var cameraRight = camera.global_transform.basis.z
+	var cameraRight = camera.global_transform.basis.x
 	# Camera looking up or down has no impact on input
 	cameraRight.y = 0
 	cameraRight = cameraRight.normalized()
