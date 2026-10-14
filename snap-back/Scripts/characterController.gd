@@ -23,6 +23,7 @@ var bumperPrevious: bool
 
 # Game variables
 @export var otherPlayer: Node3D
+@export var splitPlayers = false
 
 # Joints
 var joint: Generic6DOFJoint3D
@@ -60,8 +61,8 @@ func _ready() -> void:
 	topJoint = topBoneSim.get_node('Physical Bone RootTorso') as PhysicalBone3D
 	bottomJoint = bottomBoneSim.get_node('Physical Bone RootHip') as PhysicalBone3D
 	# Connect bodies
-	joint.node_a = topJoint.get_path()
-	joint.node_b = bottomJoint.get_path()
+	# joint.node_a = topJoint.get_path()
+	# joint.node_b = bottomJoint.get_path()
 	# Assign variables
 	rightCalf = bottomBoneSim.get_node('Physical Bone CalfR') as PhysicalBone3D
 	leftCalf = bottomBoneSim.get_node('Physical Bone CalfL') as PhysicalBone3D
@@ -92,10 +93,12 @@ func _physics_process(delta: float) -> void:
 	var space = get_world_3d().direct_space_state
 	var result = space.intersect_ray(query)
 	if result:
-		_keepUpright()
-		_reduceMovement()
+		if (!splitPlayers):
+			_keepUpright()
+			_reduceMovement()
 		_handlePlayerInput(delta, true)
-		_rotateTowardTarget(otherPlayer.global_position, delta)
+		if (!splitPlayers):
+			_rotateTowardTarget(otherPlayer.global_position, delta)
 	else:
 		_handlePlayerInput(delta, false)
 	# Update parent
@@ -145,6 +148,12 @@ func _rotateTowardTarget(target: Vector3, delta: float) -> void:
 	topJoint.angular_velocity -= axis * topJoint.angular_velocity.y * rotationDamping * delta
 
 func _handlePlayerInput(delta: float, grounded: bool) -> void:
+	# DEBUG
+	var split = Input.is_action_just_pressed("DebugSplit")
+	if split:
+		_splitPlayers();
+	# DEBUG
+	
 	# Read thumbstick inputs
 	var topRightThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
 	var topLeftThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
@@ -210,3 +219,20 @@ func _makeRelativeToCamera(input: Vector2) -> Vector3:
 	cameraRight = cameraRight.normalized()
 	# Multiply right direction by X input, maintain Y as up
 	return cameraRight * input.x + Vector3.UP * input.y
+
+func _splitPlayers():
+	if splitPlayers:
+		return
+	joint.node_a = NodePath("")
+	joint.node_b = NodePath("")
+	# joint = Generic6DOFJoint3D.new()
+	splitPlayers = true;
+	return
+
+# Debug toggle between split and not split
+func _DEBUGSplitPlayerToggle():
+	if splitPlayers:
+		splitPlayers = false
+	else:
+		splitPlayers = true
+	return

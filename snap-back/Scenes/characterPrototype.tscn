@@ -69,7 +69,7 @@ shadow_blur = 0.5
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2170405, -0.8444228, -0.004642725)
 
 [node name="Top3" parent="." unique_id=316937011 instance=ExtResource("3_53enj")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.21704054, -0.8444228, -0.004642725)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1907382, 0.99302864, -0.004642725)
 
 [node name="Top4" parent="." unique_id=1394867766 instance=ExtResource("3_53enj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5915212, -0.8444228, 0.7164042)
