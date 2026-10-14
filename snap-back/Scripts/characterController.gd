@@ -5,6 +5,7 @@ extends Node3D
 @export var calfMovementStrength = 5.0
 @export var heightToRunMaintenance = 0.83
 @export var uprightMaintenanceStrength = 25.0
+@export var splitUprightMaintenanceStrength = 25.0
 @export var rotationSpeed = 2.5
 @export var rotationDamping = 50.0
 @export var bodyDamping = 0.7
@@ -23,6 +24,7 @@ var bumperPrevious: bool
 
 # Game variables
 @export var otherPlayer: Node3D
+@export var splitPlayers = false
 
 # Joints
 var joint: Generic6DOFJoint3D
@@ -40,6 +42,7 @@ var rightUpperArmOffset: Vector3
 var leftUpperArmOffset: Vector3
 var rightCalfOffset: Vector3
 var leftCalfOffset: Vector3
+var jointOffset: Vector3
 
 # Target positions for each limb
 var rightUpperArmTarget: Vector3
@@ -63,8 +66,8 @@ func _ready() -> void:
 	topJoint = topBoneSim.get_node('Physical Bone RootTorso') as PhysicalBone3D
 	bottomJoint = bottomBoneSim.get_node('Physical Bone RootHip') as PhysicalBone3D
 	# Connect bodies
-	joint.node_a = topJoint.get_path()
-	joint.node_b = bottomJoint.get_path()
+	joint.node_a = bottomJoint.get_path()
+	joint.node_b = topJoint.get_path()
 	# Assign variables
 	rightCalf = bottomBoneSim.get_node('Physical Bone CalfR') as PhysicalBone3D
 	leftCalf = bottomBoneSim.get_node('Physical Bone CalfL') as PhysicalBone3D
@@ -75,6 +78,7 @@ func _ready() -> void:
 	leftUpperArmOffset = topJoint.global_transform.basis.inverse() * (leftUpperArm.global_position - topJoint.global_position)
 	rightCalfOffset = bottomJoint.global_transform.basis.inverse() * (rightCalf.global_position - bottomJoint.global_position)
 	leftCalfOffset = bottomJoint.global_transform.basis.inverse() * (leftCalf.global_position - bottomJoint.global_position)
+	jointOffset = bottomJoint.global_transform.basis.inverse() * (topJoint.global_position - bottomJoint.global_position)
 	# Assign camera
 	camera = get_viewport().get_camera_3d()
 	# Singleplayer setup
@@ -95,10 +99,11 @@ func _physics_process(delta: float) -> void:
 	var space = get_world_3d().direct_space_state
 	var result = space.intersect_ray(query)
 	if result:
-		_keepUpright()
-		_reduceMovement()
+		if !splitPlayers:
+			_keepUpright()
+			_reduceMovement()
+			_rotateTowardTarget(otherPlayer.global_position, delta)
 		_handlePlayerInput(delta, true)
-		_rotateTowardTarget(otherPlayer.global_position, delta)
 	else:
 		_handlePlayerInput(delta, false)
 	# Update parent
@@ -146,12 +151,17 @@ func _rotateTowardTarget(target: Vector3, delta: float) -> void:
 	# Remove rotational velocity to prevent too much spinning
 	topJoint.angular_velocity -= axis * topJoint.angular_velocity.y * rotationDamping * delta
 	# If angular velocity is opposite direction of angle, apply angular velocity
-	if ((topJoint.angular_velocity.y >= 0 && angle < 0) || (topJoint.angular_velocity.y < 0 && angle >= 0)):
+	if (topJoint.angular_velocity.y >= 0 && angle < 0) || (topJoint.angular_velocity.y < 0 && angle >= 0):
 		topJoint.angular_velocity -= axis * topJoint.angular_velocity.y * rotationSpeed
 	# Save sign of signed angle
 	lastRotationAnglePositive = angle >= 0
 
 func _handlePlayerInput(delta: float, grounded: bool) -> void:
+	# DEBUG
+	var split = Input.is_action_just_pressed("DebugSplit")
+	if split:
+		_splitPlayers()
+	# DEBUG
 	# Read thumbstick inputs
 	var topRightThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
 	var topLeftThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
@@ -175,17 +185,19 @@ func _handlePlayerInput(delta: float, grounded: bool) -> void:
 	# Get target positions for limbs
 	rightUpperArmTarget = _makeRelativeToBase(topJoint, rightUpperArmOffset) + rightUpperArmInput * maxUpperArmControlDistance
 	leftUpperArmTarget = _makeRelativeToBase(topJoint, leftUpperArmOffset) + leftUpperArmInput * maxUpperArmControlDistance
-	rightCalfTarget = _makeRelativeToBase(bottomJoint, rightCalfOffset) + rightCalfInput * maxUpperArmControlDistance
-	leftCalfTarget = _makeRelativeToBase(bottomJoint, leftCalfOffset) + leftCalfInput * maxUpperArmControlDistance
+	rightCalfTarget = _makeRelativeToBase(bottomJoint, rightCalfOffset) + rightCalfInput * maxCalfControlDistance
+	leftCalfTarget = _makeRelativeToBase(bottomJoint, leftCalfOffset) + leftCalfInput * maxCalfControlDistance
 	# Apply velocity to get limbs to target positions
-	rightUpperArm.linear_velocity += _getVelocityToTarget(rightUpperArm.global_position, rightUpperArmTarget, upperArmMovementStrength)
-	leftUpperArm.linear_velocity += _getVelocityToTarget(leftUpperArm.global_position, leftUpperArmTarget, upperArmMovementStrength)
+	var splitArmModifier = 0.5 if splitPlayers else 1.0
+	var splitCalfModifier = 0.15 if splitPlayers else 1.0
 	var rightCalfVelocity = _getVelocityToTarget(rightCalf.global_position, rightCalfTarget, calfMovementStrength)
-	rightCalf.linear_velocity += rightCalfVelocity
 	var leftCalfVelocity = _getVelocityToTarget(leftCalf.global_position, leftCalfTarget, calfMovementStrength)
-	leftCalf.linear_velocity += leftCalfVelocity
+	rightUpperArm.linear_velocity += _getVelocityToTarget(rightUpperArm.global_position, rightUpperArmTarget, upperArmMovementStrength) * splitArmModifier
+	leftUpperArm.linear_velocity += _getVelocityToTarget(leftUpperArm.global_position, leftUpperArmTarget, upperArmMovementStrength) * splitArmModifier
+	rightCalf.linear_velocity += rightCalfVelocity * splitCalfModifier
+	leftCalf.linear_velocity += leftCalfVelocity * splitCalfModifier
 	# If grounded, apply opposite of calf velocity average multipled by movement strength
-	if grounded:
+	if grounded && !splitPlayers:
 		bottomJoint.linear_velocity -= (rightCalfVelocity + leftCalfVelocity) / 2 * calfMovementStrength
 	# If single player and button pressed, swap controlled half of body
 	if singlePlayer:
@@ -217,3 +229,17 @@ func _makeRelativeToCamera(input: Vector2) -> Vector3:
 	cameraRight = cameraRight.normalized()
 	# Multiply right direction by X input, maintain Y as up
 	return cameraRight * input.x + Vector3.UP * input.y
+
+func _splitPlayers():
+	if splitPlayers:
+		topJoint.global_position = _makeRelativeToBase(bottomJoint, jointOffset)
+		joint.global_basis = bottomJoint.global_basis
+		topJoint.global_basis = bottomJoint.global_basis * Basis(Vector3.RIGHT, PI) * Basis(Vector3.FORWARD, PI / -2.0)
+		joint.node_a = bottomJoint.get_path()
+		joint.node_b = topJoint.get_path()
+		splitPlayers = false
+		return
+	joint.node_a = NodePath("")
+	joint.node_b = NodePath("")
+	splitPlayers = true
+	return
