@@ -113,6 +113,12 @@ otherPlayer = NodePath("../Character2")
 [node name="Top" parent="Character" unique_id=1504632149 instance=ExtResource("5_6tqc2")]
 
 [node name="Joint" type="Generic6DOFJoint3D" parent="Character" unique_id=829068928]
+linear_limit_x/softness = 16.0
+linear_limit_y/softness = 16.0
+linear_limit_z/softness = 16.0
+angular_limit_x/softness = 16.0
+angular_limit_y/softness = 16.0
+angular_limit_z/softness = 16.0
 
 [node name="Character2" type="Node3D" parent="." unique_id=2017855393 node_paths=PackedStringArray("otherPlayer")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6124609, 0.02783084, 0)
@@ -126,4 +132,10 @@ otherPlayer = NodePath("../Character")
 
 [node name="Top" parent="Character2" unique_id=28256667 instance=ExtResource("5_6tqc2")]
 
-[node name="Joint" type="Generic6DOFJoint3D" parent="Character2" unique_id=858979169]
+[node name="Joint" type="Generic6DOFJoint3D" parent="Character2" unique_id=1213715451]
+linear_limit_x/softness = 16.0
+linear_limit_y/softness = 16.0
+linear_limit_z/softness = 16.0
+angular_limit_x/softness = 16.0
+angular_limit_y/softness = 16.0
+angular_limit_z/softness = 16.0

@@ -42,7 +42,7 @@ var rightUpperArmOffset: Vector3
 var leftUpperArmOffset: Vector3
 var rightCalfOffset: Vector3
 var leftCalfOffset: Vector3
-var jointOffset: Vector3
+var jointOffset: Transform3D
 
 # Target positions for each limb
 var rightUpperArmTarget: Vector3
@@ -78,7 +78,7 @@ func _ready() -> void:
 	leftUpperArmOffset = topJoint.global_transform.basis.inverse() * (leftUpperArm.global_position - topJoint.global_position)
 	rightCalfOffset = bottomJoint.global_transform.basis.inverse() * (rightCalf.global_position - bottomJoint.global_position)
 	leftCalfOffset = bottomJoint.global_transform.basis.inverse() * (leftCalf.global_position - bottomJoint.global_position)
-	jointOffset = bottomJoint.global_transform.basis.inverse() * (topJoint.global_position - bottomJoint.global_position)
+	jointOffset = bottomJoint.global_transform.affine_inverse() * topJoint.global_transform
 	# Assign camera
 	camera = get_viewport().get_camera_3d()
 	# Singleplayer setup
@@ -156,12 +156,15 @@ func _rotateTowardTarget(target: Vector3, delta: float) -> void:
 	# Save sign of signed angle
 	lastRotationAnglePositive = angle >= 0
 
+# Get inputs and apply to limbs
 func _handlePlayerInput(delta: float, grounded: bool) -> void:
+	
 	# DEBUG
 	var split = Input.is_action_just_pressed("DebugSplit")
 	if split:
 		_splitPlayers()
 	# DEBUG
+	
 	# Read thumbstick inputs
 	var topRightThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
 	var topLeftThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
@@ -211,7 +214,10 @@ func _handlePlayerInput(delta: float, grounded: bool) -> void:
 				topController = bottomController
 				bottomController = 999
 				print('Controlling top')
-		bumperPrevious = bumper 
+		bumperPrevious = bumper
+	# If players aren't split, keep transform of top as the bottom (removes weird physics problem upon reconnection)
+	if !splitPlayers:
+		_setTopTransform()
 
 # Apply a saved offset, accounting for rotation
 func _makeRelativeToBase(baseJoint: PhysicalBone3D, offset: Vector3) -> Vector3:
@@ -230,11 +236,20 @@ func _makeRelativeToCamera(input: Vector2) -> Vector3:
 	# Multiply right direction by X input, maintain Y as up
 	return cameraRight * input.x + Vector3.UP * input.y
 
-func _splitPlayers():
+# Set the top transform to match that of the bottom
+func _setTopTransform() -> void:
+	var reconnectTransform: Transform3D = bottomJoint.global_transform * jointOffset
+	topJoint.global_transform = reconnectTransform
+
+# Depending on splitPlayers, either split the bodies or reconnect them
+func _splitPlayers() -> void:
 	if splitPlayers:
-		topJoint.global_position = _makeRelativeToBase(bottomJoint, jointOffset)
-		joint.global_basis = bottomJoint.global_basis
-		topJoint.global_basis = bottomJoint.global_basis * Basis(Vector3.RIGHT, PI) * Basis(Vector3.FORWARD, PI / -2.0)
+		bottomJoint.angular_velocity = Vector3.ZERO
+		bottomJoint.linear_velocity = Vector3.ZERO
+		topJoint.angular_velocity = Vector3.ZERO
+		topJoint.linear_velocity = Vector3.ZERO
+		await get_tree().physics_frame
+		_setTopTransform()
 		joint.node_a = bottomJoint.get_path()
 		joint.node_b = topJoint.get_path()
 		splitPlayers = false
