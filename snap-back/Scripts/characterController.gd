@@ -47,6 +47,9 @@ var leftUpperArmTarget: Vector3
 var rightCalfTarget: Vector3
 var leftCalfTarget: Vector3
 
+# Previous rotation value, true or false
+var lastRotationAnglePositive: bool
+
 # Camera for making input relative
 var camera: Camera3D
 
@@ -138,11 +141,15 @@ func _rotateTowardTarget(target: Vector3, delta: float) -> void:
 	var axis = Vector3.UP
 	var angle = atan2(forward.cross(targetDirection).y, forward.dot(targetDirection))
 	var correction = angle * rotationSpeed
-	# Rotate torso, apply oppsoite rotation to pelvis to avoid spinning forever
 	# Add rotational velocity
 	topJoint.angular_velocity += axis * correction
 	# Remove rotational velocity to prevent too much spinning
 	topJoint.angular_velocity -= axis * topJoint.angular_velocity.y * rotationDamping * delta
+	# If angular velocity is opposite direction of angle, apply angular velocity
+	if ((topJoint.angular_velocity.y >= 0 && angle < 0) || (topJoint.angular_velocity.y < 0 && angle >= 0)):
+		topJoint.angular_velocity -= axis * topJoint.angular_velocity.y * rotationSpeed
+	# Save sign of signed angle
+	lastRotationAnglePositive = angle >= 0
 
 func _handlePlayerInput(delta: float, grounded: bool) -> void:
 	# Read thumbstick inputs
