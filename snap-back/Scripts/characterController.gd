@@ -61,8 +61,8 @@ func _ready() -> void:
 	topJoint = topBoneSim.get_node('Physical Bone RootTorso') as PhysicalBone3D
 	bottomJoint = bottomBoneSim.get_node('Physical Bone RootHip') as PhysicalBone3D
 	# Connect bodies
-	# joint.node_a = topJoint.get_path()
-	# joint.node_b = bottomJoint.get_path()
+	joint.node_a = topJoint.get_path()
+	joint.node_b = bottomJoint.get_path()
 	# Assign variables
 	rightCalf = bottomBoneSim.get_node('Physical Bone CalfR') as PhysicalBone3D
 	leftCalf = bottomBoneSim.get_node('Physical Bone CalfL') as PhysicalBone3D
@@ -182,13 +182,21 @@ func _handlePlayerInput(delta: float, grounded: bool) -> void:
 	# Apply velocity to get limbs to target positions
 	rightUpperArm.linear_velocity += _getVelocityToTarget(rightUpperArm.global_position, rightUpperArmTarget, upperArmMovementStrength)
 	leftUpperArm.linear_velocity += _getVelocityToTarget(leftUpperArm.global_position, leftUpperArmTarget, upperArmMovementStrength)
-	var rightCalfVelocity = _getVelocityToTarget(rightCalf.global_position, rightCalfTarget, calfMovementStrength)
-	rightCalf.linear_velocity += rightCalfVelocity
-	var leftCalfVelocity = _getVelocityToTarget(leftCalf.global_position, leftCalfTarget, calfMovementStrength)
-	leftCalf.linear_velocity += leftCalfVelocity
-	# If grounded, apply opposite of calf velocity average multipled by movement strength
-	if grounded:
-		bottomJoint.linear_velocity -= (rightCalfVelocity + leftCalfVelocity) / 2 * calfMovementStrength
+	
+	# This section of the code is causing the legs to spazz out currently.
+	# Not entirely sure if the right plan is to fix this code, or make different code for when the player is split.
+	# For now I'm just disabling this when the player's split. I think it'll cause the legs player to lose all control though...
+	# Sidenote: I'm fairly certain the exact same bug is happening with the arms, but it's not nearly as bad. 
+	# The body seems to manage to not fling itself out of existance. - Dave
+	if !splitPlayers:
+		var rightCalfVelocity = _getVelocityToTarget(rightCalf.global_position, rightCalfTarget, calfMovementStrength)
+		rightCalf.linear_velocity += rightCalfVelocity
+		var leftCalfVelocity = _getVelocityToTarget(leftCalf.global_position, leftCalfTarget, calfMovementStrength)
+		leftCalf.linear_velocity += leftCalfVelocity
+		# If grounded, apply opposite of calf velocity average multipled by movement strength
+		if grounded:
+			bottomJoint.linear_velocity -= (rightCalfVelocity + leftCalfVelocity) / 2 * calfMovementStrength
+
 	# If single player and button pressed, swap controlled half of body
 	if singlePlayer:
 		var bumper = Input.is_joy_button_pressed(bottomController if bottomController != 999 else topController, JOY_BUTTON_RIGHT_SHOULDER)
