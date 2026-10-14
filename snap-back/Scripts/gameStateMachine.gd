@@ -9,6 +9,7 @@ enum GameState {
 	GAME_OVER,
 	PAUSED
 }
+@export var debugLabel: Label
 var currentState: GameState
 var resumeState: GameState
 
@@ -36,6 +37,7 @@ const playerTimeReduction: float = 2.0
 func _ready() -> void:
 	currentState = GameState.GAME_WAITING
 	print('Controls\n1 >> Toggle player 1 down\n2 >> Toggle player 2 down\n3 >> Start game\n4 >> Pause game')
+	debugLabel.text = 'Controls\n1 >> Toggle player 1 down\n2 >> Toggle player 2 down\n3 >> Start game\n4 >> Pause game'
 	return
 
 # On every frame, runs global function, then function specific to current state
@@ -72,6 +74,7 @@ func _globalLoop() -> void:
 	if paused && currentState != GameState.PAUSED:
 		resumeState = currentState
 		currentState = GameState.PAUSED
+		PhysicsServer3D.set_active(false)
 	return
 
 # Logic while waiting for the game to begin
@@ -88,8 +91,10 @@ func _gameCountdown(delta: float) -> void:
 		gameCountdownTimer = 0.0
 		currentState = GameState.GAME
 		print('Game started!')
+		debugLabel.text = 'Game started!'
 		return
 	print('Game Countdown: ' + str(snappedf(gameCountdownTimer, 0.1)))
+	debugLabel.text = 'Game Countdown: ' + str(snappedf(gameCountdownTimer, 0.1))
 	return
 
 # Core game logic
@@ -100,6 +105,7 @@ func _game() -> void:
 		currentState = GameState.PLAYER_DOWN
 		return
 	print('Main game state! P1 outs: ' + str(player1Outs) + ' || P2 outs: ' + str(player2Outs))
+	debugLabel.text = 'Main game state! P1 outs: ' + str(player1Outs) + ' || P2 outs: ' + str(player2Outs)
 	return
 
 # Logic for when at least 1 player is split
@@ -110,6 +116,7 @@ func _playerDown(delta: float) -> void:
 		player2Timer = _getPlayerTimer(player2Outs)
 		lastPlayerDown = 0
 		print('Both players down!')
+		debugLabel.text = 'Both players down!'
 		return
 	# Player 1 timer
 	if player1Down:
@@ -122,6 +129,7 @@ func _playerDown(delta: float) -> void:
 			currentState = GameState.GAME_OVER
 			return
 		print('Player 1 timer: ' + str(snappedf(player1Timer, 0.1)) + ' (Outs: ' + str(player1Outs) + ')')
+		debugLabel.text = 'Player 1 timer: ' + str(snappedf(player1Timer, 0.1)) + ' (Outs: ' + str(player1Outs) + ')'
 		return
 	# Player 2 timer
 	if player2Down:
@@ -134,6 +142,7 @@ func _playerDown(delta: float) -> void:
 			currentState = GameState.GAME_OVER
 			return
 		print('Player 2 timer: ' + str(snappedf(player2Timer, 0.1)) + ' (Outs: ' + str(player2Outs) + ')')
+		debugLabel.text = 'Player 2 timer: ' + str(snappedf(player2Timer, 0.1)) + ' (Outs: ' + str(player2Outs) + ')'
 		return
 	# Nobody is down, add out to last player to reconnect. If both players reconnect on the same frame, no outs are added. Then resume game
 	if lastPlayerDown == 1:
@@ -146,14 +155,17 @@ func _playerDown(delta: float) -> void:
 # Logic for the game being over
 func _gameOver() -> void:
 	print('Game over! Player ' + ('ONE' if player1Win else 'TWO') + ' wins!')
+	debugLabel.text = 'Game over! Player ' + ('ONE' if player1Win else 'TWO') + ' wins!'
 	return
 
 # Logic when the game is paused (waits until unpaused to resume)
 func _paused() -> void:
 	if !paused:
 		currentState = resumeState
+		PhysicsServer3D.set_active(true)
 		return
 	print('Game paused')
+	debugLabel.text = 'Game paused'
 	return
 
 # Shortcut to get total timer for player

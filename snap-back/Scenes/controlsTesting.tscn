@@ -13,8 +13,9 @@ size = Vector3(7.779541, 1, 4.5273438)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_1ohda"]
 
-[node name="ControlsTesting" type="Node3D" unique_id=1011487555]
+[node name="ControlsTesting" type="Node3D" unique_id=1011487555 node_paths=PackedStringArray("debugLabel")]
 script = ExtResource("1_m2lay")
+debugLabel = NodePath("Camera3D/DebugLabel")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1019244076 node_paths=PackedStringArray("object1", "object2", "cameraBounds")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35800695, 0.996895)
@@ -23,6 +24,14 @@ script = ExtResource("1_n7tqr")
 object1 = NodePath("../Character/Top")
 object2 = NodePath("../Character2/Top")
 cameraBounds = NodePath("../CameraBounds")
+
+[node name="DebugLabel" type="Label" parent="Camera3D" unique_id=109217037]
+offset_left = 22.0
+offset_top = 23.0
+offset_right = 1131.0
+offset_bottom = 627.0
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
 
 [node name="CameraBounds" type="MeshInstance3D" parent="." unique_id=635781397]
 transform = Transform3D(54.100666, 0, 0, 0, 10.345334, 0, 0, 0, 29.819696, 0, 0, 0)
