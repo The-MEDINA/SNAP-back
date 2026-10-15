@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cg428p35w5yyh"]
 
-[ext_resource type="Script" uid="uid://bpbndav6i0rmi" path="res://Scenes/button_manager.gd" id="1_ejqe8"]
+[ext_resource type="Script" uid="uid://bpbndav6i0rmi" path="res://Scripts/button_manager.gd" id="1_ejqe8"]
 
 [node name="CharacterSelect" type="Control" unique_id=480896808 node_paths=PackedStringArray("top_mesh_node", "bottom_mesh_node")]
 layout_mode = 3
