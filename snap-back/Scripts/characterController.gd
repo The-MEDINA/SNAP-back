@@ -6,9 +6,13 @@ extends Node3D
 @export var heightToRunMaintenance = 0.83
 @export var uprightMaintenanceStrength = 25.0
 @export var splitUprightMaintenanceStrength = 25.0
-@export var rotationSpeed = 2.5
-@export var rotationDamping = 50.0
+@export var rotationSpeed = 15.0
+@export var rotationDamping = 100.0
 @export var bodyDamping = 0.7
+
+# Force length required to split
+@export var worldForceThreshold = 25.0
+@export var playerForceThreshold = 2.0
 
 # Controls values
 @export var maxUpperArmControlDistance = 0.3
@@ -68,6 +72,9 @@ func _ready() -> void:
 	joint = $Joint
 	topBoneSim = $Top/ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D
 	bottomBoneSim = $Bottom/ArmatureBottom/Skeleton3D/PhysicalBoneSimulator3D
+	# Start bone simulation
+	topBoneSim.physical_bones_start_simulation()
+	bottomBoneSim.physical_bones_start_simulation()
 	# Get joints to connect
 	topJoint = topBoneSim.get_node('Physical Bone RootTorso') as PhysicalBone3D
 	bottomJoint = bottomBoneSim.get_node('Physical Bone RootHip') as PhysicalBone3D
@@ -229,18 +236,18 @@ func _handlePlayerInput(delta: float, grounded: bool) -> void:
 	# Move the player along the ground with movement (seperately between arms and legs if split)
 	if grounded || splitPlayers:
 		var leftCalfInputChange = (leftCalfInput - lastLeftCalfInput) * Vector3(1,0,1)
-		if leftCalfInput.length() > lastLeftCalfInput.length():
-			bottomJoint.global_position += leftCalfInputChange * maxCalfControlDistance
+		if leftCalfInput.length() < lastLeftCalfInput.length():
+			bottomJoint.global_position -= leftCalfInputChange * maxCalfControlDistance
 		var rightCalfInputChange = (rightCalfInput - lastRightCalfInput) * Vector3(1,0,1)
-		if rightCalfInput.length() > lastRightCalfInput.length():
-			bottomJoint.global_position += rightCalfInputChange * maxCalfControlDistance
+		if rightCalfInput.length() < lastRightCalfInput.length():
+			bottomJoint.global_position -= rightCalfInputChange * maxCalfControlDistance
 	if splitPlayers:
 		var leftUpperArmInputChange = (leftUpperArmInput - lastLeftUpperArmInput) * Vector3(1,0,1)
-		if leftUpperArmInput.length() > lastLeftUpperArmInput.length():
-			topJoint.global_position += leftUpperArmInputChange * maxUpperArmControlDistance
+		if leftUpperArmInput.length() < lastLeftUpperArmInput.length():
+			topJoint.global_position -= leftUpperArmInputChange * maxUpperArmControlDistance
 		var rightUpperArmInputChange = (rightUpperArmInput - lastRightUpperArmInput) * Vector3(1,0,1)
-		if rightUpperArmInput.length() > lastRightUpperArmInput.length():
-			topJoint.global_position += rightUpperArmInputChange * maxUpperArmControlDistance
+		if rightUpperArmInput.length() < lastRightUpperArmInput.length():
+			topJoint.global_position -= rightUpperArmInputChange * maxUpperArmControlDistance
 	# Save thumbstick positions for use on next tick
 	lastLeftCalfInput = leftCalfInput
 	lastRightCalfInput = rightCalfInput
@@ -287,3 +294,18 @@ func _splitPlayers() -> void:
 	joint.node_a = NodePath("")
 	joint.node_b = NodePath("")
 	splitPlayers = true
+
+# Force was applied to a bone, split if high enough
+func _receiveForce(bone: PhysicalBone3D, force: Vector3, collider: Object) -> void:
+	# If force is from other bone, ensure force isn't from self and other player is the acting player
+	if collider is PhysicalBone3D:
+		# If colliding with self, do nothing
+		if bone.parent.is_ancestor_of(collider):
+			return
+		# If bone velocity is greater than other player's velocity, ignore collision
+		if bone.linear_velocity.length() > collider.linear_velocity.length():
+			return
+	# Check force
+	var usedForceThreshold = playerForceThreshold if collider.name == "Character" else worldForceThreshold
+	if force.length() > usedForceThreshold && !splitPlayers:
+		_splitPlayers()
