@@ -39,11 +39,12 @@ layers = 0
 mesh = SubResource("BoxMesh_32bnj")
 
 [node name="RimLight" type="AreaLight3D" parent="." unique_id=58461841]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.131692)
 light_energy = 2.0
 light_cull_mask = 4294967293
 
 [node name="FillLight" type="AreaLight3D" parent="." unique_id=1179843079]
-transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.9417353)
 light_energy = 0.465
 shadow_enabled = true
 shadow_blur = 3.0
@@ -109,10 +110,18 @@ script = ExtResource("3_gg4yg")
 otherPlayer = NodePath("../Character2")
 
 [node name="Bottom" parent="Character" unique_id=623702786 instance=ExtResource("4_gg4yg")]
+script = null
 
 [node name="Top" parent="Character" unique_id=1504632149 instance=ExtResource("5_6tqc2")]
+script = null
 
 [node name="Joint" type="Generic6DOFJoint3D" parent="Character" unique_id=829068928]
+linear_limit_x/softness = 16.0
+linear_limit_y/softness = 16.0
+linear_limit_z/softness = 16.0
+angular_limit_x/softness = 16.0
+angular_limit_y/softness = 16.0
+angular_limit_z/softness = 16.0
 
 [node name="Character2" type="Node3D" parent="." unique_id=2017855393 node_paths=PackedStringArray("otherPlayer")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6124609, 0.02783084, 0)
@@ -126,4 +135,10 @@ otherPlayer = NodePath("../Character")
 
 [node name="Top" parent="Character2" unique_id=28256667 instance=ExtResource("5_6tqc2")]
 
-[node name="Joint" type="Generic6DOFJoint3D" parent="Character2" unique_id=858979169]
+[node name="Joint" type="Generic6DOFJoint3D" parent="Character2" unique_id=1213715451]
+linear_limit_x/softness = 16.0
+linear_limit_y/softness = 16.0
+linear_limit_z/softness = 16.0
+angular_limit_x/softness = 16.0
+angular_limit_y/softness = 16.0
+angular_limit_z/softness = 16.0
