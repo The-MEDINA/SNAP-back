@@ -13,8 +13,10 @@ size = Vector3(7.779541, 1, 4.5273438)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_1ohda"]
 
-[node name="ControlsTesting" type="Node3D" unique_id=1011487555 node_paths=PackedStringArray("debugLabel")]
+[node name="ControlsTesting" type="Node3D" unique_id=1011487555 node_paths=PackedStringArray("player1", "player2", "debugLabel")]
 script = ExtResource("1_m2lay")
+player1 = NodePath("Character")
+player2 = NodePath("Character2")
 debugLabel = NodePath("Camera3D/DebugLabel")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1019244076 node_paths=PackedStringArray("object1", "object2", "cameraBounds")]
@@ -105,7 +107,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35119498, 0)
 shape = SubResource("BoxShape3D_5ti0k")
 
 [node name="Character" type="Node3D" parent="." unique_id=2122778959 node_paths=PackedStringArray("otherPlayer")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.33509, 0.038232327, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4025886, 0.038232327, 0)
 script = ExtResource("3_gg4yg")
 otherPlayer = NodePath("../Character2")
 
@@ -124,11 +126,10 @@ angular_limit_y/softness = 16.0
 angular_limit_z/softness = 16.0
 
 [node name="Character2" type="Node3D" parent="." unique_id=2017855393 node_paths=PackedStringArray("otherPlayer")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6124609, 0.02783084, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3823717, 0.02783084, 0)
 script = ExtResource("3_gg4yg")
-topController = 2
-bottomController = 3
-singlePlayer = false
+topController = 1
+bottomController = 1
 otherPlayer = NodePath("../Character")
 
 [node name="Bottom" parent="Character2" unique_id=190974490 instance=ExtResource("4_gg4yg")]
