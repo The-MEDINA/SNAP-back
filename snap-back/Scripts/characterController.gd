@@ -50,6 +50,12 @@ var leftUpperArmTarget: Vector3
 var rightCalfTarget: Vector3
 var leftCalfTarget: Vector3
 
+# Last relative inputs for movement (arms for movement when split)
+var lastLeftCalfInput: Vector3
+var lastRightCalfInput: Vector3
+var lastLeftUpperArmInput: Vector3
+var lastRightUpperArmInput: Vector3
+
 # Previous rotation value, true or false
 var lastRotationAnglePositive: bool
 
@@ -103,6 +109,7 @@ func _physics_process(delta: float) -> void:
 			_keepUpright()
 			_reduceMovement()
 			_rotateTowardTarget(otherPlayer.global_position, delta)
+			_setTopTransform()
 		_handlePlayerInput(delta, true)
 	else:
 		_handlePlayerInput(delta, false)
@@ -185,11 +192,15 @@ func _handlePlayerInput(delta: float, grounded: bool) -> void:
 	leftUpperArmInput -= leftUpperArmInput * topLeftTrigger * triggerMaxReduction
 	rightCalfInput -= rightCalfInput * bottomRightTrigger * triggerMaxReduction
 	leftCalfInput -= leftCalfInput * bottomLeftTrigger * triggerMaxReduction
-	# Get target positions for limbs
-	rightUpperArmTarget = _makeRelativeToBase(topJoint, rightUpperArmOffset) + rightUpperArmInput * maxUpperArmControlDistance
-	leftUpperArmTarget = _makeRelativeToBase(topJoint, leftUpperArmOffset) + leftUpperArmInput * maxUpperArmControlDistance
-	rightCalfTarget = _makeRelativeToBase(bottomJoint, rightCalfOffset) + rightCalfInput * maxCalfControlDistance
-	leftCalfTarget = _makeRelativeToBase(bottomJoint, leftCalfOffset) + leftCalfInput * maxCalfControlDistance
+	# Get target positions for limbs, accounting for base joint rotation
+	var relativeRightUpperArm = _makeRelativeToBase(topJoint, rightUpperArmOffset)
+	var relativeLeftUpperArm = _makeRelativeToBase(topJoint, leftUpperArmOffset)
+	var relativeRightCalf = _makeRelativeToBase(bottomJoint, rightCalfOffset)
+	var relativeLeftCalf = _makeRelativeToBase(bottomJoint, leftCalfOffset)
+	rightUpperArmTarget = relativeRightUpperArm + rightUpperArmInput * maxUpperArmControlDistance
+	leftUpperArmTarget = relativeLeftUpperArm + leftUpperArmInput * maxUpperArmControlDistance
+	rightCalfTarget = relativeRightCalf + rightCalfInput * maxCalfControlDistance
+	leftCalfTarget = relativeLeftCalf + leftCalfInput * maxCalfControlDistance
 	# Apply velocity to get limbs to target positions
 	var splitArmModifier = 0.5 if splitPlayers else 1.0
 	var splitCalfModifier = 0.15 if splitPlayers else 1.0
@@ -215,9 +226,26 @@ func _handlePlayerInput(delta: float, grounded: bool) -> void:
 				bottomController = 999
 				print('Controlling top')
 		bumperPrevious = bumper
-	# If players aren't split, keep transform of top as the bottom (removes weird physics problem upon reconnection)
-	if !splitPlayers:
-		_setTopTransform()
+	# Move the player along the ground with movement (seperately between arms and legs if split)
+	if grounded || splitPlayers:
+		var leftCalfInputChange = (leftCalfInput - lastLeftCalfInput) * Vector3(1,0,1)
+		if leftCalfInput.length() > lastLeftCalfInput.length():
+			bottomJoint.global_position += leftCalfInputChange * maxCalfControlDistance
+		var rightCalfInputChange = (rightCalfInput - lastRightCalfInput) * Vector3(1,0,1)
+		if rightCalfInput.length() > lastRightCalfInput.length():
+			bottomJoint.global_position += rightCalfInputChange * maxCalfControlDistance
+	if splitPlayers:
+		var leftUpperArmInputChange = (leftUpperArmInput - lastLeftUpperArmInput) * Vector3(1,0,1)
+		if leftUpperArmInput.length() > lastLeftUpperArmInput.length():
+			topJoint.global_position += leftUpperArmInputChange * maxUpperArmControlDistance
+		var rightUpperArmInputChange = (rightUpperArmInput - lastRightUpperArmInput) * Vector3(1,0,1)
+		if rightUpperArmInput.length() > lastRightUpperArmInput.length():
+			topJoint.global_position += rightUpperArmInputChange * maxUpperArmControlDistance
+	# Save thumbstick positions for use on next tick
+	lastLeftCalfInput = leftCalfInput
+	lastRightCalfInput = rightCalfInput
+	lastLeftUpperArmInput = leftUpperArmInput
+	lastRightUpperArmInput = rightUpperArmInput
 
 # Apply a saved offset, accounting for rotation
 func _makeRelativeToBase(baseJoint: PhysicalBone3D, offset: Vector3) -> Vector3:
@@ -243,6 +271,7 @@ func _setTopTransform() -> void:
 
 # Depending on splitPlayers, either split the bodies or reconnect them
 func _splitPlayers() -> void:
+	# Split >> not split, reconnect
 	if splitPlayers:
 		bottomJoint.angular_velocity = Vector3.ZERO
 		bottomJoint.linear_velocity = Vector3.ZERO
@@ -254,7 +283,7 @@ func _splitPlayers() -> void:
 		joint.node_b = topJoint.get_path()
 		splitPlayers = false
 		return
+	# Not split >> split, disconnect the bodies
 	joint.node_a = NodePath("")
 	joint.node_b = NodePath("")
 	splitPlayers = true
-	return
