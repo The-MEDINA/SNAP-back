@@ -5,7 +5,6 @@ extends Node3D
 @export var calfMovementStrength = 5.0
 @export var heightToRunMaintenance = 0.83
 @export var uprightMaintenanceStrength = 25.0
-@export var splitUprightMaintenanceStrength = 25.0
 @export var rotationSpeed = 15.0
 @export var rotationDamping = 100.0
 @export var bodyDamping = 0.7
@@ -21,7 +20,6 @@ extends Node3D
 @export var worldForceThreshold = 1500.0
 @export var playerTopForceThreshold = 35.0
 @export var playerBottomForceThreshold = 350.0
-@export var playerForceAllowance: float
 
 # Controls values
 @export var maxUpperArmControlDistance = 0.3
@@ -75,9 +73,6 @@ var lastLeftCalfInput: Vector3
 var lastRightCalfInput: Vector3
 var lastLeftUpperArmInput: Vector3
 var lastRightUpperArmInput: Vector3
-
-# Previous rotation value, true or false
-var lastRotationAnglePositive: bool
 
 # Camera for making input relative
 var camera: Camera3D
@@ -186,8 +181,6 @@ func _rotateTowardTarget(target: Vector3, delta: float) -> void:
 	# If angular velocity is opposite direction of angle, apply angular velocity
 	if (topJoint.angular_velocity.y >= 0 && angle < 0) || (topJoint.angular_velocity.y < 0 && angle >= 0):
 		topJoint.angular_velocity -= axis * topJoint.angular_velocity.y * rotationSpeed
-	# Save sign of signed angle
-	lastRotationAnglePositive = angle >= 0
 
 # Get inputs and apply to limbs
 func _handlePlayerInput(delta: float, grounded: bool) -> void:
