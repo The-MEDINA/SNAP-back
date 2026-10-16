@@ -6,31 +6,28 @@ class CharacterPart:
 	var role: String
 	var mesh: Mesh
 	
-	func _init(p_name: String, p_role: String,p_mesh: Mesh) -> void:
+	func _init(p_name: String, p_role: String, p_mesh: Mesh) -> void:
 		name = p_name
 		role = p_role
 		mesh = p_mesh
 		
 		
 #UI References
-#Top References
+#Top References# UI References
 @onready var top_name_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/TopNameLabel
 @onready var top_role_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/TopRoleLabel
 @onready var top_prev_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/TopPrevBtn
 @onready var top_next_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/TopNextBtn
 @onready var top_lock_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/TopLockInButton
 
-#Bottom References
 @onready var bottom_name_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomNameLabel
 @onready var bottom_role_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomRoleLabel
 @onready var bottom_prev_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/BottomPrevBtn
 @onready var bottom_next_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/BottomNextBtn
 @onready var bottom_lock_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/BottomLockInButton
 
-
-#3D Mesh Instance References
-@export var top_mesh_node: MeshInstance3D
-@export var bottom_mesh_node: MeshInstance3D
+@onready var top_mesh_node: MeshInstance3D = $MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Skeleton3D/MeshInstance3D
+@onready var bottom_mesh_node: MeshInstance3D = $MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Skeleton3D/MeshInstance3D2
 
 #Character Part State Tracking
 #Array of character parts
@@ -106,32 +103,18 @@ func _setup_character_parts() -> void:
 		CharacterPart.new("Red Bottom", "Speed", red_cube),
 		CharacterPart.new("Blue Bottom", "Stability", blue_sphere)
 	]
-	#==================================
-	# WHEN 3D MESHES ARE READY (Examples)
-	#==================================
-	#top_parts = [
-	# 	CharacterPart.new("Scarecrow", "Light", preload("res://Assets/3D/Armor/top_knight.tres")),
-	# ]
-	#
-	# bottom_parts = [
-	# 	CharacterPart.new("Scarecrow", "Light", preload("res://Assets/3D/Armor/bottom_knight.tres")),
-	# ]
 
 #Function to cycle through the tops, and update
 func _cycle_top(dir: int) -> void:
-	#make sure there is a 
 	if p1_locked or top_parts.is_empty():
 		return
 	current_top_index = (current_top_index + dir + top_parts.size()) % top_parts.size()
 	_update_display()	
 
 #Function to cycle through the bottoms and update
-# -1 = previous index
-# 1 = next index 
 func _cycle_bottom(dir: int) -> void:
 	if p2_locked or bottom_parts.is_empty():
 		return
-	#Change index based on number passed in
 	current_bottom_index = (current_bottom_index + dir + bottom_parts.size()) % bottom_parts.size()
 	_update_display()
 
@@ -157,4 +140,14 @@ func _on_bottom_lock_pressed() -> void:
 func _check_both_ready() -> void:
 	if p1_locked and p2_locked:
 		print("Both players locked in their meshes!")
-		# Transition to gameplay scene
+		
+		# 1. SAVE CHOICES TO GAMEMANAGER
+		GameManager.save_choices(
+			0,                   # P1 Controller Device ID
+			1,                   # P2 Controller Device ID
+			current_top_index,   # Selected Top Part
+			current_bottom_index # Selected Bottom Part
+		)
+		
+		# 2. CHANGE TO YOUR ARENA SCENE (Change path to match your scene)
+		get_tree().change_scene_to_file("res://Scenes/characterPrototype.tscn")

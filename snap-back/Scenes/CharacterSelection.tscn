@@ -1,23 +1,21 @@
 [gd_scene format=3 uid="uid://cg428p35w5yyh"]
 
-[ext_resource type="Script" uid="uid://bpbndav6i0rmi" path="res://Scripts/button_manager.gd" id="1_ejqe8"]
+[ext_resource type="Script" uid="uid://bvth3g67kvjr3" path="res://Scripts/GameManager.gd" id="1_ejqe8"]
 
-[node name="CharacterSelect" type="Control" unique_id=480896808 node_paths=PackedStringArray("top_mesh_node", "bottom_mesh_node")]
+[node name="CharacterSelect" type="Control" unique_id=480896808]
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
 script = ExtResource("1_ejqe8")
-top_mesh_node = NodePath("MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Skeleton3D/MeshInstance3D")
-bottom_mesh_node = NodePath("MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Skeleton3D/MeshInstance3D2")
 
 [node name="MainHBoxContainer" type="HBoxContainer" parent="." unique_id=1870354763]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 1.0
+offset_top = -2.0
+offset_right = 586.0
+offset_bottom = 647.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -37,7 +35,7 @@ theme_override_constants/separation = 60
 layout_mode = 2
 theme_override_constants/separation = 25
 
-[node name="Top" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2" unique_id=233345948]
+[node name="Top1" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2" unique_id=233345948]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 30
@@ -46,7 +44,7 @@ text = "Top"
 [node name="HBoxContainer" type="HBoxContainer" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2" unique_id=183221713]
 layout_mode = 2
 
-[node name="TopPrevBtn" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer" unique_id=1572036947]
+[node name="TopPrevBtn1" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer" unique_id=1572036947]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
@@ -59,24 +57,24 @@ size_flags_horizontal = 6
 size_flags_vertical = 4
 theme_override_constants/separation = 15
 
-[node name="TopNameLabel" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer" unique_id=981552109]
+[node name="TopNameLabel1" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer" unique_id=981552109]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Name"
 
-[node name="TopRoleLabel" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer" unique_id=493588580]
+[node name="TopRoleLabel1" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer" unique_id=493588580]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Role"
 
-[node name="TopNextBtn" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer" unique_id=66782738]
+[node name="TopNextBtn1" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer" unique_id=66782738]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 theme_override_font_sizes/font_size = 40
 text = ">"
 
-[node name="TopLockInButton" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2" unique_id=5843294]
+[node name="TopLockInButton1" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2" unique_id=5843294]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -98,7 +96,7 @@ text = "Bottom"
 [node name="HBoxContainer2" type="HBoxContainer" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=107434215]
 layout_mode = 2
 
-[node name="BottomPrevBtn" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2" unique_id=1198520786]
+[node name="BottomPrevBtn1" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2" unique_id=1198520786]
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 40
@@ -110,24 +108,24 @@ size_flags_horizontal = 6
 size_flags_vertical = 4
 theme_override_constants/separation = 15
 
-[node name="BottomNameLabel" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer" unique_id=1254839490]
+[node name="BottomNameLabel1" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer" unique_id=1254839490]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Name"
 
-[node name="BottomRoleLabel" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer" unique_id=1149499393]
+[node name="BottomRoleLabel1" type="Label" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer" unique_id=1149499393]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Role"
 
-[node name="BottomNextBtn" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2" unique_id=1167250052]
+[node name="BottomNextBtn1" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2" unique_id=1167250052]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 theme_override_font_sizes/font_size = 40
 text = ">"
 
-[node name="BottomLockInButton" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=2012523151]
+[node name="BottomLockInButton1" type="Button" parent="MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=2012523151]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -142,11 +140,11 @@ stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="MainHBoxContainer/SubViewportContainer" unique_id=1816881582]
 handle_input_locally = false
-size = Vector2i(574, 648)
+size = Vector2i(291, 649)
 render_target_update_mode = 4
 
 [node name="Camera3D" type="Camera3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport" unique_id=147444632]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 3)
+transform = Transform3D(1, 0, 0, 0, 0.9848077, 0.17364818, 0, -0.17364818, 0.9848077, 0, 1, 3)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport" unique_id=962340239]
 
@@ -159,3 +157,154 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Skeleton3D" unique_id=742495059]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+
+[node name="MainHBoxContainer2" type="HBoxContainer" parent="." unique_id=1609251018]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 585.0
+offset_top = -2.0
+offset_right = 1159.0
+offset_bottom = 647.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="MainHBoxContainer2" unique_id=1913223335]
+layout_mode = 2
+size_flags_horizontal = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="MainHBoxContainer2/SubViewportContainer" unique_id=1450594684]
+handle_input_locally = false
+size = Vector2i(285, 649)
+render_target_update_mode = 4
+
+[node name="Camera3D" type="Camera3D" parent="MainHBoxContainer2/SubViewportContainer/SubViewport" unique_id=926898720]
+transform = Transform3D(1, 0, 0, 0, 0.9848077, 0.17364818, 0, -0.17364818, 0.9848077, 0, 1, 3)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="MainHBoxContainer2/SubViewportContainer/SubViewport" unique_id=665114098]
+
+[node name="Node3D" type="Node3D" parent="MainHBoxContainer2/SubViewportContainer/SubViewport" unique_id=1995841700]
+
+[node name="Skeleton3D" type="Skeleton3D" parent="MainHBoxContainer2/SubViewportContainer/SubViewport/Node3D" unique_id=1661307254]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MainHBoxContainer2/SubViewportContainer/SubViewport/Node3D/Skeleton3D" unique_id=2084686703]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="MainHBoxContainer2/SubViewportContainer/SubViewport/Node3D/Skeleton3D" unique_id=874933653]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+
+[node name="PanelContainer" type="PanelContainer" parent="MainHBoxContainer2" unique_id=287356887]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MainHBoxContainer2/PanelContainer" unique_id=2103304413]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainHBoxContainer2/PanelContainer/MarginContainer" unique_id=1119383286]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 60
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer" unique_id=1736314663]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="Top" type="Label" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2" unique_id=638280450]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Top"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2" unique_id=918303190]
+layout_mode = 2
+
+[node name="TopPrevBtn" type="Button" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer" unique_id=1598642576]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 40
+text = "<"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer" unique_id=210048152]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme_override_constants/separation = 15
+
+[node name="TopNameLabel" type="Label" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer" unique_id=1670947987]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Name"
+
+[node name="TopRoleLabel" type="Label" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer" unique_id=1352400451]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Role"
+
+[node name="TopNextBtn" type="Button" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer" unique_id=1189945116]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 40
+text = ">"
+
+[node name="TopLockInButton" type="Button" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2" unique_id=150602436]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 24
+text = "Lock In
+"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer" unique_id=1751634590]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 25
+
+[node name="Bottom" type="Label" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=213527676]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Bottom"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=590988870]
+layout_mode = 2
+
+[node name="BottomPrevBtn" type="Button" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2" unique_id=1603139626]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 40
+text = "<"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2" unique_id=1371508636]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme_override_constants/separation = 15
+
+[node name="BottomNameLabel" type="Label" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer" unique_id=1095399267]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Name"
+
+[node name="BottomRoleLabel" type="Label" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer" unique_id=266941244]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Role"
+
+[node name="BottomNextBtn" type="Button" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2" unique_id=1294885087]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 40
+text = ">"
+
+[node name="BottomLockInButton" type="Button" parent="MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=273663059]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 24
+text = "Lock In
+"
