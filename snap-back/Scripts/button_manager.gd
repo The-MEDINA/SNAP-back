@@ -14,17 +14,19 @@ class CharacterPart:
 		
 #UI References
 #Top References
-@onready var top_name_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/TopNameLabel
-@onready var top_role_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/TopRoleLabel
-@onready var top_prev_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/TopPrevBtn
-@onready var top_next_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/TopNextBtn
-@onready var top_lock_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/TopLockInButton
+@onready var top_name_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/TopNameLabel
+@onready var top_role_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/TopRoleLabel
+@onready var top_prev_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/TopPrevBtn
+@onready var top_next_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/TopNextBtn
+@onready var top_lock_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/TopLockInButton
+
 #Bottom References
-@onready var bottom_name_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomNameLabel
-@onready var bottom_role_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomRoleLabel
-@onready var bottom_prev_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2/BottomPrevBtn
-@onready var bottom_next_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2/BottomNextBtn
-@onready var bottom_lock_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/BottomLockInButton
+@onready var bottom_name_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomNameLabel
+@onready var bottom_role_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomRoleLabel
+@onready var bottom_prev_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/BottomPrevBtn
+@onready var bottom_next_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/BottomNextBtn
+@onready var bottom_lock_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/BottomLockInButton
+
 
 #3D Mesh Instance References
 @export var top_mesh_node: MeshInstance3D

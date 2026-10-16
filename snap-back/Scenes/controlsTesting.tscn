@@ -13,8 +13,11 @@ size = Vector3(7.779541, 1, 4.5273438)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_1ohda"]
 
-[node name="ControlsTesting" type="Node3D" unique_id=1011487555]
+[node name="ControlsTesting" type="Node3D" unique_id=1011487555 node_paths=PackedStringArray("player1", "player2", "debugLabel")]
 script = ExtResource("1_m2lay")
+player1 = NodePath("Character")
+player2 = NodePath("Character2")
+debugLabel = NodePath("Camera3D/DebugLabel")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1019244076 node_paths=PackedStringArray("object1", "object2", "cameraBounds")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35800695, 0.996895)
@@ -24,17 +27,26 @@ object1 = NodePath("../Character/Top")
 object2 = NodePath("../Character2/Top")
 cameraBounds = NodePath("../CameraBounds")
 
+[node name="DebugLabel" type="Label" parent="Camera3D" unique_id=109217037]
+offset_left = 22.0
+offset_top = 23.0
+offset_right = 1131.0
+offset_bottom = 627.0
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+
 [node name="CameraBounds" type="MeshInstance3D" parent="." unique_id=635781397]
 transform = Transform3D(54.100666, 0, 0, 0, 10.345334, 0, 0, 0, 29.819696, 0, 0, 0)
 layers = 0
 mesh = SubResource("BoxMesh_32bnj")
 
 [node name="RimLight" type="AreaLight3D" parent="." unique_id=58461841]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.131692)
 light_energy = 2.0
 light_cull_mask = 4294967293
 
 [node name="FillLight" type="AreaLight3D" parent="." unique_id=1179843079]
-transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.9417353)
 light_energy = 0.465
 shadow_enabled = true
 shadow_blur = 3.0
@@ -95,26 +107,39 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35119498, 0)
 shape = SubResource("BoxShape3D_5ti0k")
 
 [node name="Character" type="Node3D" parent="." unique_id=2122778959 node_paths=PackedStringArray("otherPlayer")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.33509, 0.038232327, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4025886, 0.038232327, 0)
 script = ExtResource("3_gg4yg")
 otherPlayer = NodePath("../Character2")
 
 [node name="Bottom" parent="Character" unique_id=623702786 instance=ExtResource("4_gg4yg")]
+script = null
 
 [node name="Top" parent="Character" unique_id=1504632149 instance=ExtResource("5_6tqc2")]
+script = null
 
 [node name="Joint" type="Generic6DOFJoint3D" parent="Character" unique_id=829068928]
+linear_limit_x/softness = 16.0
+linear_limit_y/softness = 16.0
+linear_limit_z/softness = 16.0
+angular_limit_x/softness = 16.0
+angular_limit_y/softness = 16.0
+angular_limit_z/softness = 16.0
 
 [node name="Character2" type="Node3D" parent="." unique_id=2017855393 node_paths=PackedStringArray("otherPlayer")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6124609, 0.02783084, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3823717, 0.02783084, 0)
 script = ExtResource("3_gg4yg")
-topController = 2
-bottomController = 3
-singlePlayer = false
+topController = 1
+bottomController = 1
 otherPlayer = NodePath("../Character")
 
 [node name="Bottom" parent="Character2" unique_id=190974490 instance=ExtResource("4_gg4yg")]
 
 [node name="Top" parent="Character2" unique_id=28256667 instance=ExtResource("5_6tqc2")]
 
-[node name="Joint" type="Generic6DOFJoint3D" parent="Character2" unique_id=858979169]
+[node name="Joint" type="Generic6DOFJoint3D" parent="Character2" unique_id=1213715451]
+linear_limit_x/softness = 16.0
+linear_limit_y/softness = 16.0
+linear_limit_z/softness = 16.0
+angular_limit_x/softness = 16.0
+angular_limit_y/softness = 16.0
+angular_limit_z/softness = 16.0
