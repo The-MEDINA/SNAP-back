@@ -1,4 +1,4 @@
-extends Skeleton3D # Or CharacterBody3D if you change node types later
+extends Skeleton3D 
 
 @export_enum("char1", "char2") var character_key: String = "char1"
 

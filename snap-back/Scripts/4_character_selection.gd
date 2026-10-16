@@ -4,7 +4,7 @@ extends Control
 @export var top_options: Array[PartOption] = []
 @export var bottom_options: Array[PartOption] = []
 
-# --- Character 1 Node References (P1 = Top, P2 = Bottom) ---
+# Character 1 Node References (P1 = Top, P2 = Bottom) 
 @onready var c1_top_mesh: MeshInstance3D = $MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1/TopMesh
 @onready var c1_bottom_mesh: MeshInstance3D = $MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1/BottomMesh
 
@@ -14,7 +14,7 @@ extends Control
 @onready var p2_name_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomNameLabel1
 @onready var p2_role_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomRoleLabel1
 
-# --- Character 2 Node References (P3 = Top, P4 = Bottom) ---
+# Character 2 Node References (P3 = Top, P4 = Bottom)
 @onready var c2_top_mesh: MeshInstance3D = $MainHBoxContainer2/SubViewportContainer/SubViewport/Node3D/Character2/TopMesh
 @onready var c2_bottom_mesh: MeshInstance3D = $MainHBoxContainer2/SubViewportContainer/SubViewport/Node3D/Character2/BottomMesh
 
@@ -24,7 +24,7 @@ extends Control
 @onready var p4_name_label: Label = $MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomNameLabel
 @onready var p4_role_label: Label = $MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomRoleLabel
 
-# --- Button Connections (Character 1) ---
+#Button Connections (Character 1) 
 @onready var p1_prev_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/TopPrevBtn1
 @onready var p1_next_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/TopNextBtn1
 @onready var p1_lock_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/TopLockInButton1
@@ -33,7 +33,7 @@ extends Control
 @onready var p2_next_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/BottomNextBtn1
 @onready var p2_lock_btn: Button = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/BottomLockInButton1
 
-# --- Button Connections (Character 2) ---
+# Button Connections (Character 2) 
 @onready var p3_prev_btn: Button = $MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/TopPrevBtn
 @onready var p3_next_btn: Button = $MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/TopNextBtn
 @onready var p3_lock_btn: Button = $MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/TopLockInButton
