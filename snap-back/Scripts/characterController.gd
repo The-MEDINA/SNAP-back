@@ -10,9 +10,18 @@ extends Node3D
 @export var rotationDamping = 100.0
 @export var bodyDamping = 0.7
 
+# Movement values
+@export var upwardCalfMovementMultiplier = 1.25
+@export var upwardCalfSplitMovementMultiplier = 0.5
+@export var calfMovementMultiplier = 250.0
+@export var calfSplitMovementMultiplier = 18.75
+@export var upperArmSplitMovementMultiplier = 0.175
+
 # Force length required to split
-@export var worldForceThreshold = 25.0
-@export var playerForceThreshold = 2.0
+@export var worldForceThreshold = 1500.0
+@export var playerTopForceThreshold = 35.0
+@export var playerBottomForceThreshold = 350.0
+@export var playerForceAllowance: float
 
 # Controls values
 @export var maxUpperArmControlDistance = 0.3
@@ -29,6 +38,13 @@ var bumperPrevious: bool
 # Game variables
 @export var otherPlayer: Node3D
 @export var splitPlayers = false
+
+# Reconnection values
+@export var reconnectionDistance = 1.0
+@export var reconnectionTimerMax = 1.0
+var reconnectionTimer = reconnectionTimerMax
+@export var safetyTimerAfterReconnection = 1.0
+var safetyTimer = safetyTimerAfterReconnection
 
 # Joints
 var joint: Generic6DOFJoint3D
@@ -99,10 +115,6 @@ func _ready() -> void:
 		topController = 999
 		print('Controlling bottom')
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
 # Runs on physics tick
 func _physics_process(delta: float) -> void:
 	# Check to see if body should be upright (only if body is close to ground), Character and Joint never actually move
@@ -117,9 +129,16 @@ func _physics_process(delta: float) -> void:
 			_reduceMovement()
 			_rotateTowardTarget(otherPlayer.global_position, delta)
 			_setTopTransform()
+		else:
+			_tryReconnect(delta)
 		_handlePlayerInput(delta, true)
 	else:
 		_handlePlayerInput(delta, false)
+	# Update safety timer if need be
+	if safetyTimer > 0.0:
+		safetyTimer -= delta
+		if safetyTimer < 0.0:
+			safetyTimer = 0.0
 	# Update parent
 	global_position = (bottomJoint.global_position + topJoint.global_position) / 2.0
 
@@ -172,13 +191,6 @@ func _rotateTowardTarget(target: Vector3, delta: float) -> void:
 
 # Get inputs and apply to limbs
 func _handlePlayerInput(delta: float, grounded: bool) -> void:
-	
-	# DEBUG
-	var split = Input.is_action_just_pressed("DebugSplit")
-	if split:
-		_splitPlayers()
-	# DEBUG
-	
 	# Read thumbstick inputs
 	var topRightThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
 	var topLeftThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
@@ -233,21 +245,29 @@ func _handlePlayerInput(delta: float, grounded: bool) -> void:
 				bottomController = 999
 				print('Controlling top')
 		bumperPrevious = bumper
-	# Move the player along the ground with movement (seperately between arms and legs if split)
+	# Move the player along the ground with movement (seperately between arms and legs if split)	
 	if grounded || splitPlayers:
-		var leftCalfInputChange = (leftCalfInput - lastLeftCalfInput) * Vector3(1,0,1)
+		var calfMultiplier = calfSplitMovementMultiplier if splitPlayers else calfMovementMultiplier
+		var calfVectorMultiplier = Vector3(1,upwardCalfSplitMovementMultiplier if splitPlayers else upwardCalfMovementMultiplier,1) if grounded else Vector3(1,0,1)
+		var leftCalfInputChange = (leftCalfInput - lastLeftCalfInput) * calfVectorMultiplier
+		# Y shouldn't be allowed to be greater than 0, also no Y when airborne
+		if leftCalfInputChange.y > 0:
+			leftCalfInputChange.y = 0
 		if leftCalfInput.length() < lastLeftCalfInput.length():
-			bottomJoint.global_position -= leftCalfInputChange * maxCalfControlDistance
-		var rightCalfInputChange = (rightCalfInput - lastRightCalfInput) * Vector3(1,0,1)
+			bottomJoint.linear_velocity -= leftCalfInputChange * maxCalfControlDistance * calfMultiplier
+		var rightCalfInputChange = (rightCalfInput - lastRightCalfInput) * calfVectorMultiplier
+		if rightCalfInputChange.y > 0:
+			rightCalfInputChange.y = 0
 		if rightCalfInput.length() < lastRightCalfInput.length():
-			bottomJoint.global_position -= rightCalfInputChange * maxCalfControlDistance
+			bottomJoint.linear_velocity -= rightCalfInputChange * maxCalfControlDistance * calfMultiplier
 	if splitPlayers:
+		# Arms have no grounded value, cannot move vertically
 		var leftUpperArmInputChange = (leftUpperArmInput - lastLeftUpperArmInput) * Vector3(1,0,1)
 		if leftUpperArmInput.length() < lastLeftUpperArmInput.length():
-			topJoint.global_position -= leftUpperArmInputChange * maxUpperArmControlDistance
+			topJoint.global_position -= leftUpperArmInputChange * maxUpperArmControlDistance * upperArmSplitMovementMultiplier
 		var rightUpperArmInputChange = (rightUpperArmInput - lastRightUpperArmInput) * Vector3(1,0,1)
 		if rightUpperArmInput.length() < lastRightUpperArmInput.length():
-			topJoint.global_position -= rightUpperArmInputChange * maxUpperArmControlDistance
+			topJoint.global_position -= rightUpperArmInputChange * maxUpperArmControlDistance * upperArmSplitMovementMultiplier
 	# Save thumbstick positions for use on next tick
 	lastLeftCalfInput = leftCalfInput
 	lastRightCalfInput = rightCalfInput
@@ -277,9 +297,9 @@ func _setTopTransform() -> void:
 	topJoint.global_transform = reconnectTransform
 
 # Depending on splitPlayers, either split the bodies or reconnect them
-func _splitPlayers() -> void:
+func _splitPlayers(split: bool) -> void:
 	# Split >> not split, reconnect
-	if splitPlayers:
+	if !split:
 		bottomJoint.angular_velocity = Vector3.ZERO
 		bottomJoint.linear_velocity = Vector3.ZERO
 		topJoint.angular_velocity = Vector3.ZERO
@@ -289,6 +309,7 @@ func _splitPlayers() -> void:
 		joint.node_a = bottomJoint.get_path()
 		joint.node_b = topJoint.get_path()
 		splitPlayers = false
+		safetyTimer = safetyTimerAfterReconnection
 		return
 	# Not split >> split, disconnect the bodies
 	joint.node_a = NodePath("")
@@ -297,15 +318,40 @@ func _splitPlayers() -> void:
 
 # Force was applied to a bone, split if high enough
 func _receiveForce(bone: PhysicalBone3D, force: Vector3, collider: Object) -> void:
+	var usedForceThreshold = worldForceThreshold
+	# Forces mean nothing if split or if safety timer is up
+	if splitPlayers || safetyTimer > 0:
+		return
 	# If force is from other bone, ensure force isn't from self and other player is the acting player
 	if collider is PhysicalBone3D:
 		# If colliding with self, do nothing
 		if bone.parent.is_ancestor_of(collider):
 			return
+		# If other player is down, do nothing
+		if bone.parent.splitPlayers:
+			return
 		# If bone velocity is greater than other player's velocity, ignore collision
 		if bone.linear_velocity.length() > collider.linear_velocity.length():
 			return
+		# Set threshold depending on the section of bones that was hit
+		if bone.subParent.name == "Top":
+			usedForceThreshold = playerTopForceThreshold
+		else:
+			usedForceThreshold = playerBottomForceThreshold
 	# Check force
-	var usedForceThreshold = playerForceThreshold if collider.name == "Character" else worldForceThreshold
+	print('force: ', force.length())
+	print('required: ', usedForceThreshold)
 	if force.length() > usedForceThreshold && !splitPlayers:
-		_splitPlayers()
+		_splitPlayers(true)
+
+# Run timer that prevents reconnection, then try to reconnect players
+func _tryReconnect(delta: float) -> void:
+	if reconnectionTimer > 0:
+		reconnectionTimer -= delta
+		if reconnectionTimer <= 0:
+			reconnectionTimer = 0
+		else:
+			return
+	if bottomJoint.global_position.distance_to(topJoint.global_position) < reconnectionDistance:
+		_splitPlayers(false)
+		reconnectionTimer = reconnectionTimerMax

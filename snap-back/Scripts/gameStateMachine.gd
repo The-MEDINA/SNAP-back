@@ -1,4 +1,4 @@
-extends Node
+extends Node3D
 
 # This script acts as a state machine, thus using an enum
 enum GameState {
@@ -9,19 +9,21 @@ enum GameState {
 	GAME_OVER,
 	PAUSED
 }
+@export var player1: Node3D
+@export var player2: Node3D
 @export var debugLabel: Label
 var currentState: GameState
 var resumeState: GameState
+var player1Down: bool
+var player2Down: bool
 
 # Debug values for us, these will be set through events occuring before or during the game
 var startGame: bool = false
-var player1Down: bool = false
-var player2Down: bool = false
 var paused: bool = false
 
 # Variables specific to player timers and game over condition
-var player1Timer: float = 10.0
-var player2Timer: float = 10.0
+var player1Timer: float
+var player2Timer: float
 var player1Outs: int = 0
 var player2Outs: int = 0
 var lastPlayerDown: int = 0
@@ -29,15 +31,17 @@ var player1Win: bool = false
 
 # Other variables
 var gameCountdownTimer: float = 3.0
-const basePlayerTimer: float = 10.0
+const basePlayerTimer: float = 15.0
 const minPlayerTimer: float = 6.0
-const playerTimeReduction: float = 2.0
+const playerTimeReduction: float = 3.0
+var lastPhysicsState: bool
 
 # Initial value setup
 func _ready() -> void:
 	currentState = GameState.GAME_WAITING
-	print('Controls\n1 >> Toggle player 1 down\n2 >> Toggle player 2 down\n3 >> Start game\n4 >> Pause game')
-	debugLabel.text = 'Controls\n1 >> Toggle player 1 down\n2 >> Toggle player 2 down\n3 >> Start game\n4 >> Pause game'
+	print('Controls\n3 >> Start game\n4 >> Pause game')
+	debugLabel.text = 'Controls\n3 >> Start game\n4 >> Pause game'
+	PhysicsServer3D.set_active(false)
 	return
 
 # On every frame, runs global function, then function specific to current state
@@ -71,9 +75,12 @@ func _globalLoop() -> void:
 	if Input.is_action_just_pressed("DebugPause"):
 		paused = !paused
 	# Logic to always run
+	player1Down = player1.splitPlayers
+	player2Down = player2.splitPlayers
 	if paused && currentState != GameState.PAUSED:
 		resumeState = currentState
 		currentState = GameState.PAUSED
+		lastPhysicsState = PhysicsServer3D.space_is_active(get_world_3d().space)
 		PhysicsServer3D.set_active(false)
 	return
 
@@ -92,6 +99,8 @@ func _gameCountdown(delta: float) -> void:
 		currentState = GameState.GAME
 		print('Game started!')
 		debugLabel.text = 'Game started!'
+		lastPhysicsState = true
+		PhysicsServer3D.set_active(true)
 		return
 	print('Game Countdown: ' + str(snappedf(gameCountdownTimer, 0.1)))
 	debugLabel.text = 'Game Countdown: ' + str(snappedf(gameCountdownTimer, 0.1))
@@ -156,13 +165,14 @@ func _playerDown(delta: float) -> void:
 func _gameOver() -> void:
 	print('Game over! Player ' + ('ONE' if player1Win else 'TWO') + ' wins!')
 	debugLabel.text = 'Game over! Player ' + ('ONE' if player1Win else 'TWO') + ' wins!'
+	PhysicsServer3D.set_active(false)
 	return
 
 # Logic when the game is paused (waits until unpaused to resume)
 func _paused() -> void:
 	if !paused:
 		currentState = resumeState
-		PhysicsServer3D.set_active(true)
+		PhysicsServer3D.set_active(lastPhysicsState)
 		return
 	print('Game paused')
 	debugLabel.text = 'Game paused'
