@@ -277,12 +277,19 @@ func _getVelocityToTarget(currentPosition: Vector3, targetPosition: Vector3, mov
 # Make a Vector2 thumbstick input relative to the camera in world space
 func _makeRelativeToCamera(input: Vector2) -> Vector3:
 	# Get right direction of camera (basis is a 3x3 matrix containing local axes)
-	var cameraRight = camera.global_transform.basis.x
+	var rightVector = camera.global_transform.basis.x
 	# Camera looking up or down has no impact on input
-	cameraRight.y = 0
-	cameraRight = cameraRight.normalized()
+	rightVector.y = 0
+	rightVector = rightVector.normalized()
 	# Multiply right direction by X input, maintain Y as up
-	return cameraRight * input.x + Vector3.UP * input.y
+	return rightVector * input.x + Vector3.UP * input.y
+	
+# Make a Vector2 thumbstick input relative to the camera in world space
+func _makeRelativeForSplit(input: Vector2, joint: PhysicalBone3D) -> Vector3:
+	# When split, movement should be diagonal to camera plane.
+	# For ex, when split, moving right will move the player right AND toward the camera plane.
+	# When close to the camera plane, stop moving diagonally to allow max movement distance on plane.
+	return Vector3.ZERO
 
 # Set the top transform to match that of the bottom
 func _setTopTransform() -> void:
