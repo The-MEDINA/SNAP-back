@@ -4,7 +4,7 @@ extends Node3D
 @export var upperArmMovementStrength = 1.5
 @export var calfMovementStrength = 5.0
 @export var heightToRunMaintenance = 0.83
-@export var uprightMaintenanceStrength = 25.0
+@export var uprightMaintenanceStrength = 65.0
 @export var rotationSpeed = 10.0
 @export var rotationDamping = 300.0
 @export var bodyDamping = 0.7
@@ -13,8 +13,8 @@ extends Node3D
 @export var upwardCalfMovementMultiplier = 1.5
 @export var upwardCalfSplitMovementMultiplier = 0.5
 @export var calfMovementMultiplier = 250.0
-@export var calfSplitMovementMultiplier = 17.5
-@export var upperArmSplitMovementMultiplier = 0.8
+@export var calfSplitMovementMultiplier = 25.0
+@export var upperArmSplitMovementMultiplier = 10.0
 @export var distanceForMaxSplitDiagonalMovement = 3.0
 
 # Force length required to split
@@ -124,15 +124,14 @@ func _physics_process(delta: float) -> void:
 	var result = space.intersect_ray(query)
 	grounded = result.size() > 0
 	# Series of function calls for handling physics and input
-	_handlePlayerInput(delta)
-	if grounded:
-		if !splitPlayers:
-			_keepUpright()
-			_reduceMovement()
-			_rotateTowardTarget(otherPlayer.global_position, delta)
-			_setTopTransform()
+	if grounded && !splitPlayers:
+		_keepUpright()
+		_reduceMovement()
+		_rotateTowardTarget(otherPlayer.global_position, delta)
+		_setTopTransform()
 	if splitPlayers:
 		_tryReconnect(delta)
+	_handlePlayerInput(delta)
 	# Update safety timer if need be
 	if safetyTimer > 0.0:
 		safetyTimer -= delta
@@ -269,8 +268,8 @@ func _handlePlayerInput(delta: float) -> void:
 			topJoint.linear_velocity -= rightUpperArmInputChange * maxUpperArmControlDistance * upperArmSplitMovementMultiplier
 	# If any form of leg input change is present, raise character up to prevent impact on floor
 	if !splitPlayers && grounded:
-		var inputChange = abs(rightCalfInputChange) + abs(leftCalfInputChange)
-		bottomJoint.linear_velocity += Vector3.UP * inputChange * 9.81
+		var inputChange = abs(rightCalfInputChange.length()) + abs(leftCalfInputChange.length())
+		bottomJoint.linear_velocity += Vector3.UP * inputChange * 9.81 / 2.0
 	# Save thumbstick positions for use on next tick
 	lastLeftCalfInput = leftCalfInput
 	lastRightCalfInput = rightCalfInput

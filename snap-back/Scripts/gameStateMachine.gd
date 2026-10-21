@@ -31,9 +31,9 @@ var player1Win: bool = false
 
 # Other variables
 var gameCountdownTimer: float = 3.0
-const basePlayerTimer: float = 1500.0
-const minPlayerTimer: float = 6.0
-const playerTimeReduction: float = 3.0
+const basePlayerTimer: float = 30.0
+const minPlayerTimer: float = 10.0
+const playerTimeReduction: float = 5.0
 var lastPhysicsState = false
 
 # Initial value setup
