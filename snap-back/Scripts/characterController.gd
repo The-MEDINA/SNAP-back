@@ -5,12 +5,12 @@ extends Node3D
 @export var calfMovementStrength = 5.0
 @export var heightToRunMaintenance = 0.83
 @export var uprightMaintenanceStrength = 25.0
-@export var rotationSpeed = 15.0
-@export var rotationDamping = 100.0
+@export var rotationSpeed = 10.0
+@export var rotationDamping = 300.0
 @export var bodyDamping = 0.7
 
 # Movement values
-@export var upwardCalfMovementMultiplier = 1.25
+@export var upwardCalfMovementMultiplier = 1.5
 @export var upwardCalfSplitMovementMultiplier = 0.5
 @export var calfMovementMultiplier = 250.0
 @export var calfSplitMovementMultiplier = 15.0
@@ -78,6 +78,9 @@ var lastRightUpperArmInput: Vector3
 # Camera for making input relative
 var camera: Camera3D
 
+# Misc
+var grounded: bool
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Assign variables
@@ -119,17 +122,16 @@ func _physics_process(delta: float) -> void:
 	query.collision_mask = 8
 	var space = get_world_3d().direct_space_state
 	var result = space.intersect_ray(query)
-	if result:
+	grounded = result.size() > 0
+	if grounded:
 		if !splitPlayers:
 			_keepUpright()
 			_reduceMovement()
 			_rotateTowardTarget(otherPlayer.global_position, delta)
 			_setTopTransform()
-		else:
-			_tryReconnect(delta)
-		_handlePlayerInput(delta, true)
-	else:
-		_handlePlayerInput(delta, false)
+	_handlePlayerInput(delta)
+	if splitPlayers:
+		_tryReconnect(delta)
 	# Update safety timer if need be
 	if safetyTimer > 0.0:
 		safetyTimer -= delta
@@ -162,6 +164,7 @@ func _reduceMovement() -> void:
 	bottomJoint.linear_velocity *= bodyDamping
 
 # Rotate parent toward the target Vector3
+# THIS IS CAUSING THE CHARACTER TO FLY WHEN MID-AIR
 func _rotateTowardTarget(target: Vector3, delta: float) -> void:
 	# Get target direction
 	var targetDirection = target - global_position
@@ -175,16 +178,13 @@ func _rotateTowardTarget(target: Vector3, delta: float) -> void:
 	var axis = Vector3.UP
 	var angle = atan2(forward.cross(targetDirection).y, forward.dot(targetDirection))
 	var correction = angle * rotationSpeed
-	# Add rotational velocity
-	topJoint.angular_velocity += axis * correction
-	# Remove rotational velocity to prevent too much spinning
-	topJoint.angular_velocity -= axis * topJoint.angular_velocity.y * rotationDamping * delta
-	# If angular velocity is opposite direction of angle, apply angular velocity
-	if (topJoint.angular_velocity.y >= 0 && angle < 0) || (topJoint.angular_velocity.y < 0 && angle >= 0):
-		topJoint.angular_velocity -= axis * topJoint.angular_velocity.y * rotationSpeed
+	# Add rotational velocity, remove some rotational velocity to prevent too much spinning
+	var rotationChange = (axis * correction) - (axis * topJoint.angular_velocity.y * rotationDamping * delta)
+	topJoint.angular_velocity += rotationChange
+	bottomJoint.angular_velocity -= rotationChange
 
 # Get inputs and apply to limbs
-func _handlePlayerInput(delta: float, grounded: bool) -> void:
+func _handlePlayerInput(delta: float) -> void:
 	# Read thumbstick inputs
 	var topRightThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
 	var topLeftThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
