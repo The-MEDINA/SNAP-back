@@ -5,7 +5,6 @@ extends Node3D
 @export var calfMovementStrength = 5.0
 @export var heightToRunMaintenance = 0.83
 @export var uprightMaintenanceStrength = 25.0
-@export var splitUprightMaintenanceStrength = 25.0
 @export var rotationSpeed = 15.0
 @export var rotationDamping = 100.0
 @export var bodyDamping = 0.7
@@ -14,14 +13,14 @@ extends Node3D
 @export var upwardCalfMovementMultiplier = 1.25
 @export var upwardCalfSplitMovementMultiplier = 0.5
 @export var calfMovementMultiplier = 250.0
-@export var calfSplitMovementMultiplier = 18.75
-@export var upperArmSplitMovementMultiplier = 0.175
+@export var calfSplitMovementMultiplier = 15.0
+@export var upperArmSplitMovementMultiplier = 0.8
+@export var distanceForMaxSplitDiagonalMovement = 3.0
 
 # Force length required to split
 @export var worldForceThreshold = 1500.0
 @export var playerTopForceThreshold = 35.0
 @export var playerBottomForceThreshold = 350.0
-@export var playerForceAllowance: float
 
 # Controls values
 @export var maxUpperArmControlDistance = 0.3
@@ -75,9 +74,6 @@ var lastLeftCalfInput: Vector3
 var lastRightCalfInput: Vector3
 var lastLeftUpperArmInput: Vector3
 var lastRightUpperArmInput: Vector3
-
-# Previous rotation value, true or false
-var lastRotationAnglePositive: bool
 
 # Camera for making input relative
 var camera: Camera3D
@@ -186,8 +182,6 @@ func _rotateTowardTarget(target: Vector3, delta: float) -> void:
 	# If angular velocity is opposite direction of angle, apply angular velocity
 	if (topJoint.angular_velocity.y >= 0 && angle < 0) || (topJoint.angular_velocity.y < 0 && angle >= 0):
 		topJoint.angular_velocity -= axis * topJoint.angular_velocity.y * rotationSpeed
-	# Save sign of signed angle
-	lastRotationAnglePositive = angle >= 0
 
 # Get inputs and apply to limbs
 func _handlePlayerInput(delta: float, grounded: bool) -> void:
@@ -197,10 +191,10 @@ func _handlePlayerInput(delta: float, grounded: bool) -> void:
 	var bottomRightThumbstick = Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_Y))
 	var bottomLeftThumbstick = Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_Y))
 	# Turn thumbsticks into relative Vector3s to use on body
-	var rightUpperArmInput = _makeRelativeToCamera(topRightThumbstick)
-	var leftUpperArmInput = _makeRelativeToCamera(topLeftThumbstick)
-	var rightCalfInput = _makeRelativeToCamera(bottomRightThumbstick)
-	var leftCalfInput = _makeRelativeToCamera(bottomLeftThumbstick)
+	var rightUpperArmInput = _makeRelativeToCamera(topRightThumbstick) if !splitPlayers else _makeRelativeForSplit(topRightThumbstick, rightUpperArm)
+	var leftUpperArmInput = _makeRelativeToCamera(topLeftThumbstick) if !splitPlayers else _makeRelativeForSplit(topLeftThumbstick, leftUpperArm)
+	var rightCalfInput = _makeRelativeToCamera(bottomRightThumbstick) if !splitPlayers else _makeRelativeForSplit(bottomRightThumbstick, rightCalf)
+	var leftCalfInput = _makeRelativeToCamera(bottomLeftThumbstick) if !splitPlayers else _makeRelativeForSplit(bottomLeftThumbstick, leftCalf)
 	# Read trigger values
 	var topRightTrigger = Input.get_joy_axis(topController, JOY_AXIS_TRIGGER_RIGHT)
 	var topLeftTrigger = Input.get_joy_axis(topController, JOY_AXIS_TRIGGER_LEFT)
@@ -284,12 +278,34 @@ func _getVelocityToTarget(currentPosition: Vector3, targetPosition: Vector3, mov
 # Make a Vector2 thumbstick input relative to the camera in world space
 func _makeRelativeToCamera(input: Vector2) -> Vector3:
 	# Get right direction of camera (basis is a 3x3 matrix containing local axes)
-	var cameraRight = camera.global_transform.basis.x
+	var rightVector = camera.global_transform.basis.x
 	# Camera looking up or down has no impact on input
-	cameraRight.y = 0
-	cameraRight = cameraRight.normalized()
+	rightVector.y = 0
+	rightVector = rightVector.normalized()
 	# Multiply right direction by X input, maintain Y as up
-	return cameraRight * input.x + Vector3.UP * input.y
+	return rightVector * input.x + Vector3.UP * input.y
+
+# Make a Vector2 thumbstick input relative to the camera in world space
+func _makeRelativeForSplit(input: Vector2, joint: PhysicalBone3D) -> Vector3:
+	# First, make movement relative to current camera position
+	var movement = _makeRelativeToCamera(input)
+	# Calculation is pointless if not moving
+	if movement.length() < 0.05:
+		return movement
+	# Midpoint between players, this point is on the players' plane
+	var playerMidpoint = (global_position + otherPlayer.global_position) / 2.0
+	# Need forward vector for distance calculation, no Y component to get horizontal distance
+	var forwardVector = -camera.global_transform.basis.z
+	forwardVector.y = 0
+	forwardVector = forwardVector.normalized()
+	# Distance to the plane (direction is joint position relative to midpoint, dot gives signed distance in direction)
+	var distanceToPlane = abs((joint.global_position - playerMidpoint).dot(forwardVector))
+	# Create multiplier based on distance (further away means more diagonal movement)
+	var multiplier = clampf(distanceToPlane / distanceForMaxSplitDiagonalMovement, 0.0, 1.0)
+	# Movement toward the plane
+	var diagonalMovement = forwardVector * input.x + Vector3.UP * input.y
+	# Lerp to get actual movement output
+	return movement.lerp(diagonalMovement, multiplier)
 
 # Set the top transform to match that of the bottom
 func _setTopTransform() -> void:

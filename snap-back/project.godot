@@ -11,9 +11,14 @@ config_version=5
 [application]
 
 config/name="SNAPback"
-run/main_scene="uid://canlw72q1pqdt"
+run/main_scene="uid://df2odcgu3122d"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+PlayerData="*uid://dbkrcw3v5gxg2"
+GameManager="*uid://bvth3g67kvjr3"
 
 [display]
 
