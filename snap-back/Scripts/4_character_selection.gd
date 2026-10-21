@@ -44,6 +44,7 @@ extends Control
 
 # Tracker variables
 var selected_indices: Array[int] = [0, 0, 0, 0] # [P1, P2, P3, P4]
+var device_to_player: Array[int] = [0, 1, 2, 3] # [P1, P2, P3, P4]
 var player_ready: Array[bool] = [false, false, false, false]
 
 func _ready() -> void:
@@ -124,6 +125,9 @@ func toggle_ready(player_id: int) -> void:
 		var c2_top = top_options[selected_indices[2]].mesh
 		var c2_bottom = bottom_options[selected_indices[3]].mesh
 		
+		# Match the controller to the player
+
+		
 		# Store in global singletons
 		PlayerData.save_selections(c1_top, c1_bottom, c2_top, c2_bottom)
 		
@@ -131,18 +135,18 @@ func toggle_ready(player_id: int) -> void:
 		get_tree().change_scene_to_file("res://Scenes/controlsTesting.tscn")
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("p1_left"): cycle_selection(0, -1)
-	elif event.is_action_pressed("p1_right"): cycle_selection(0, 1)
-	elif event.is_action_pressed("p1_select"): toggle_ready(0)
+	if event.is_action_pressed("LeftTrigger"): cycle_selection(0, -1)
+	elif event.is_action_pressed("RightTrigger"): cycle_selection(0, 1)
+	elif event.is_action_pressed("Select"): toggle_ready(0)
 
-	if event.is_action_pressed("p2_left"): cycle_selection(1, -1)
-	elif event.is_action_pressed("p2_right"): cycle_selection(1, 1)
-	elif event.is_action_pressed("p2_select"): toggle_ready(1)
+	#if event.is_action_pressed("p2_left"): cycle_selection(1, -1)
+	#elif event.is_action_pressed("p2_right"): cycle_selection(1, 1)
+	#elif event.is_action_pressed("p2_select"): toggle_ready(1)
 
-	if event.is_action_pressed("p3_left"): cycle_selection(2, -1)
-	elif event.is_action_pressed("p3_right"): cycle_selection(2, 1)
-	elif event.is_action_pressed("p3_select"): toggle_ready(2)
+	#if event.is_action_pressed("p3_left"): cycle_selection(2, -1)
+	#elif event.is_action_pressed("p3_right"): cycle_selection(2, 1)
+	#elif event.is_action_pressed("p3_select"): toggle_ready(2)
 
-	if event.is_action_pressed("p4_left"): cycle_selection(3, -1)
-	elif event.is_action_pressed("p4_right"): cycle_selection(3, 1)
-	elif event.is_action_pressed("p4_select"): toggle_ready(3)
+	#if event.is_action_pressed("p4_left"): cycle_selection(3, -1)
+	#elif event.is_action_pressed("p4_right"): cycle_selection(3, 1)
+	#elif event.is_action_pressed("p4_select"): toggle_ready(3)
