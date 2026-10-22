@@ -45,6 +45,8 @@ extends Control
 # Tracker variables
 var selected_indices: Array[int] = [0, 0, 0, 0] # [P1, P2, P3, P4]
 var player_ready: Array[bool] = [false, false, false, false]
+# This array converts the device ID to whatever player it is.
+var device_to_player: Array[int] = [0, 1, 2, 3]
 
 func _ready() -> void:
 	# Connect Button Signals
@@ -124,25 +126,66 @@ func toggle_ready(player_id: int) -> void:
 		var c2_top = top_options[selected_indices[2]].mesh
 		var c2_bottom = bottom_options[selected_indices[3]].mesh
 		
+		# Match the controller to the player
+
+		
 		# Store in global singletons
 		PlayerData.save_selections(c1_top, c1_bottom, c2_top, c2_bottom)
 		
 		# Change to gameplay scene
 		get_tree().change_scene_to_file("res://Scenes/controlsTesting.tscn")
 
+func swap_players(device_id: int, direction: String):
+	print("device ", device_id, " moving ", direction)
+	
+	# grab player at device index
+	var first_player = device_to_player[device_id]
+	
+	# find the player we want to swap with
+	var second_player = device_to_player[device_id]
+	if (direction == "left"):
+		second_player -= 2;
+		pass
+	elif (direction == "right"):
+		second_player += 2;
+		pass
+	elif (direction == "up"):
+		second_player -= 1;
+		pass
+	elif (direction == "down"):
+		second_player += 1
+		pass
+	if second_player > 3: second_player -= 4
+	if second_player < 0: second_player += 4
+	
+	# find the player in the array
+	var second_player_index;
+	for i in 4:
+		if device_to_player[i] == second_player:
+			second_player_index = i
+			pass
+	
+	# move players around
+	device_to_player[device_id] = second_player
+	device_to_player[second_player_index] = first_player
+	pass
+
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("p1_left"): cycle_selection(0, -1)
-	elif event.is_action_pressed("p1_right"): cycle_selection(0, 1)
-	elif event.is_action_pressed("p1_select"): toggle_ready(0)
-
-	if event.is_action_pressed("p2_left"): cycle_selection(1, -1)
-	elif event.is_action_pressed("p2_right"): cycle_selection(1, 1)
-	elif event.is_action_pressed("p2_select"): toggle_ready(1)
-
-	if event.is_action_pressed("p3_left"): cycle_selection(2, -1)
-	elif event.is_action_pressed("p3_right"): cycle_selection(2, 1)
-	elif event.is_action_pressed("p3_select"): toggle_ready(2)
-
-	if event.is_action_pressed("p4_left"): cycle_selection(3, -1)
-	elif event.is_action_pressed("p4_right"): cycle_selection(3, 1)
-	elif event.is_action_pressed("p4_select"): toggle_ready(3)
+	# testing
+	if (event.is_action_pressed("LeftTrigger") ||
+	event.is_action_pressed("RightTrigger") ||
+	event.is_action_pressed("Select")
+	):
+		print("device id: ", event.device, " device_to_player: ", device_to_player[event.device])
+	
+	
+	if event.is_action_pressed("LeftTrigger"): cycle_selection(device_to_player[event.device], -1)
+	elif event.is_action_pressed("RightTrigger"): cycle_selection(device_to_player[event.device], 1)
+	elif event.is_action_pressed("Select"): toggle_ready(device_to_player[event.device])
+	
+	# elif event.is_action_released("LeftThumbstickLeft"): swap_players(event.device, "left")
+	elif Input.is_action_just_pressed_by_event("LeftThumbstickLeft", event): swap_players(event.device, "left")
+	elif Input.is_action_just_pressed_by_event("LeftThumbstickRight", event): swap_players(event.device, "right")
+	elif Input.is_action_just_pressed_by_event("LeftThumbstickUp", event): swap_players(event.device, "up")
+	elif Input.is_action_just_pressed_by_event("LeftThumbstickDown", event): swap_players(event.device, "down")
+	# elif event.is_action_pressed("LeftThumbstickDown"): swap_players(event.device, "down")
