@@ -4,7 +4,7 @@ extends Node3D
 @export var upperArmMovementStrength = 1.5
 @export var calfMovementStrength = 5.0
 @export var heightToRunMaintenance = 0.83
-@export var uprightMaintenanceStrength = 25.0
+@export var uprightMaintenanceStrength = 65.0
 @export var rotationSpeed = 10.0
 @export var rotationDamping = 300.0
 @export var bodyDamping = 0.7
@@ -13,8 +13,8 @@ extends Node3D
 @export var upwardCalfMovementMultiplier = 1.5
 @export var upwardCalfSplitMovementMultiplier = 0.5
 @export var calfMovementMultiplier = 250.0
-@export var calfSplitMovementMultiplier = 15.0
-@export var upperArmSplitMovementMultiplier = 0.8
+@export var calfSplitMovementMultiplier = 25.0
+@export var upperArmSplitMovementMultiplier = 10.0
 @export var distanceForMaxSplitDiagonalMovement = 3.0
 
 # Force length required to split
@@ -123,15 +123,15 @@ func _physics_process(delta: float) -> void:
 	var space = get_world_3d().direct_space_state
 	var result = space.intersect_ray(query)
 	grounded = result.size() > 0
-	if grounded:
-		if !splitPlayers:
-			_keepUpright()
-			_reduceMovement()
-			_rotateTowardTarget(otherPlayer.global_position, delta)
-			_setTopTransform()
-	_handlePlayerInput(delta)
+	# Series of function calls for handling physics and input
+	if grounded && !splitPlayers:
+		_keepUpright()
+		_reduceMovement()
+		_rotateTowardTarget(otherPlayer.global_position, delta)
+		_setTopTransform()
 	if splitPlayers:
 		_tryReconnect(delta)
+	_handlePlayerInput(delta)
 	# Update safety timer if need be
 	if safetyTimer > 0.0:
 		safetyTimer -= delta
@@ -157,6 +157,7 @@ func _keepUpright() -> void:
 	# Rotate torso, apply oppsoite rotation to pelvis to avoid spinning forever
 	topJoint.angular_velocity += correction
 	bottomJoint.angular_velocity -= correction
+	
 
 # Reduce movement to make player slide less
 func _reduceMovement() -> void:
@@ -239,17 +240,20 @@ func _handlePlayerInput(delta: float) -> void:
 				bottomController = 999
 				print('Controlling top')
 		bumperPrevious = bumper
-	# Move the player along the ground with movement (seperately between arms and legs if split)	
+	# Move the player along the ground with movement (seperately between arms and legs if split)
+	# Declared outside of if-statement for use later
+	var rightCalfInputChange
+	var leftCalfInputChange
 	if grounded || splitPlayers:
 		var calfMultiplier = calfSplitMovementMultiplier if splitPlayers else calfMovementMultiplier
 		var calfVectorMultiplier = Vector3(1,upwardCalfSplitMovementMultiplier if splitPlayers else upwardCalfMovementMultiplier,1) if grounded else Vector3(1,0,1)
-		var leftCalfInputChange = (leftCalfInput - lastLeftCalfInput) * calfVectorMultiplier
+		leftCalfInputChange = (leftCalfInput - lastLeftCalfInput) * calfVectorMultiplier
 		# Y shouldn't be allowed to be greater than 0, also no Y when airborne
 		if leftCalfInputChange.y > 0:
 			leftCalfInputChange.y = 0
 		if leftCalfInput.length() < lastLeftCalfInput.length():
 			bottomJoint.linear_velocity -= leftCalfInputChange * maxCalfControlDistance * calfMultiplier
-		var rightCalfInputChange = (rightCalfInput - lastRightCalfInput) * calfVectorMultiplier
+		rightCalfInputChange = (rightCalfInput - lastRightCalfInput) * calfVectorMultiplier
 		if rightCalfInputChange.y > 0:
 			rightCalfInputChange.y = 0
 		if rightCalfInput.length() < lastRightCalfInput.length():
@@ -258,10 +262,14 @@ func _handlePlayerInput(delta: float) -> void:
 		# Arms have no grounded value, cannot move vertically
 		var leftUpperArmInputChange = (leftUpperArmInput - lastLeftUpperArmInput) * Vector3(1,0,1)
 		if leftUpperArmInput.length() < lastLeftUpperArmInput.length():
-			topJoint.global_position -= leftUpperArmInputChange * maxUpperArmControlDistance * upperArmSplitMovementMultiplier
+			topJoint.linear_velocity -= leftUpperArmInputChange * maxUpperArmControlDistance * upperArmSplitMovementMultiplier
 		var rightUpperArmInputChange = (rightUpperArmInput - lastRightUpperArmInput) * Vector3(1,0,1)
 		if rightUpperArmInput.length() < lastRightUpperArmInput.length():
-			topJoint.global_position -= rightUpperArmInputChange * maxUpperArmControlDistance * upperArmSplitMovementMultiplier
+			topJoint.linear_velocity -= rightUpperArmInputChange * maxUpperArmControlDistance * upperArmSplitMovementMultiplier
+	# If any form of leg input change is present, raise character up to prevent impact on floor
+	if !splitPlayers && grounded:
+		var inputChange = abs(rightCalfInputChange.length()) + abs(leftCalfInputChange.length())
+		bottomJoint.linear_velocity += Vector3.UP * inputChange * 9.81 / 2.0
 	# Save thumbstick positions for use on next tick
 	lastLeftCalfInput = leftCalfInput
 	lastRightCalfInput = rightCalfInput

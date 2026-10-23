@@ -20,6 +20,7 @@ player2 = NodePath("Character2")
 debugLabel = NodePath("Camera3D/DebugLabel")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1019244076 node_paths=PackedStringArray("object1", "object2", "cameraBounds")]
+physics_interpolation_mode = 2
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35800695, 0.996895)
 fov = 50.0
 script = ExtResource("1_n7tqr")
