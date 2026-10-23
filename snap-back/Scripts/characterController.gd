@@ -3,7 +3,7 @@ extends Node3D
 # Physics values
 @export var upperArmMovementStrength = 1.5
 @export var calfMovementStrength = 5.0
-@export var heightToRunMaintenance = 0.83
+@export var heightToRunMaintenance = 0.95
 @export var uprightMaintenanceStrength = 65.0
 @export var rotationSpeed = 10.0
 @export var rotationDamping = 300.0
@@ -80,6 +80,7 @@ var camera: Camera3D
 
 # Misc
 var grounded: bool
+var groundedRayResult
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -121,8 +122,8 @@ func _physics_process(delta: float) -> void:
 	# Hit only layer 4 (4th bit position for 4th layer, 1000 in binary == 8 in decimal)
 	query.collision_mask = 8
 	var space = get_world_3d().direct_space_state
-	var result = space.intersect_ray(query)
-	grounded = result.size() > 0
+	groundedRayResult = space.intersect_ray(query)
+	grounded = groundedRayResult.size() > 0
 	# Series of function calls for handling physics and input
 	if grounded && !splitPlayers:
 		_keepUpright()
@@ -153,10 +154,14 @@ func _keepUpright() -> void:
 		return
 	axis = axis.normalized()
 	# Rotation direction * angle to rotate (stronger rotation when angle is higher) * additional strength
-	var correction = axis * angle * uprightMaintenanceStrength
+	var correction = axis * angle * uprightMaintenanceStrength # * (0.1 if angle < 10.0 else 1.0)
 	# Rotate torso, apply oppsoite rotation to pelvis to avoid spinning forever
 	topJoint.angular_velocity += correction
 	bottomJoint.angular_velocity -= correction
+	# If angle is close enough to being upright, keep character standing up
+	#if angle < 5.0:
+		#if groundedRayResult.position.y + 0.75 > bottomJoint.global_position.y:
+			#topJoint.linear_velocity += Vector3.UP * abs(groundedRayResult.position.y - bottomJoint.global_position.y)
 	
 
 # Reduce movement to make player slide less
@@ -269,7 +274,8 @@ func _handlePlayerInput(delta: float) -> void:
 	# If any form of leg input change is present, raise character up to prevent impact on floor
 	if !splitPlayers && grounded:
 		var inputChange = abs(rightCalfInputChange.length()) + abs(leftCalfInputChange.length())
-		bottomJoint.linear_velocity += Vector3.UP * inputChange * 9.81 / 2.0
+		if (inputChange > 0):
+			bottomJoint.linear_velocity += Vector3.UP * inputChange * 9.81 / 2.0
 	# Save thumbstick positions for use on next tick
 	lastLeftCalfInput = leftCalfInput
 	lastRightCalfInput = rightCalfInput
