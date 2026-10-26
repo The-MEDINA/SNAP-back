@@ -26,6 +26,10 @@ extends Node3D
 @export var maxUpperArmControlDistance = 0.3
 @export var maxCalfControlDistance = 0.3
 @export var triggerMaxReduction = 0.5
+var alternateArms: bool
+var alternateLegs: bool
+var lastBottomB: bool
+var lastBottomX: bool
 
 # Controllers (0 is controller 1, 1 is controller 2, so on)
 @export var topController = 0
@@ -191,11 +195,24 @@ func _rotateTowardTarget(target: Vector3, delta: float) -> void:
 
 # Get inputs and apply to limbs
 func _handlePlayerInput(delta: float) -> void:
-	# Read thumbstick inputs
+	# Read button inputs
+	var bottomA = Input.is_joy_button_pressed(bottomController, JOY_BUTTON_A)
+	var bottomB = Input.is_joy_button_pressed(bottomController, JOY_BUTTON_B)
+	var bottomX = Input.is_joy_button_pressed(bottomController, JOY_BUTTON_X)
+	var bottomY = Input.is_joy_button_pressed(bottomController, JOY_BUTTON_Y)
+	# Read thumbstick inputs, use buttons if they're being pressed
 	var topRightThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
 	var topLeftThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
-	var bottomRightThumbstick = Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_Y))
-	var bottomLeftThumbstick = Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_Y))
+	var bottomRightThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_Y))
+		if !((bottomB || bottomX) && !alternateLegs) && !bottomY else Vector2((1.0 if bottomB else 0.0) + (-1.0 if bottomX else 0.0), (1.0 if bottomY else 0.0)))
+	var bottomLeftThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_Y))
+		if !((bottomB || bottomX) && alternateLegs) && !bottomY else Vector2((1.0 if bottomB else 0.0) + (-1.0 if bottomX else 0.0), (1.0 if bottomY else 0.0)))
+	# If button released, swap alternate variable
+	if (!bottomX && lastBottomX) || (!bottomB && lastBottomB):
+		alternateLegs = !alternateLegs
+	# Save last button values
+	lastBottomX = bottomX
+	lastBottomB = bottomB
 	# Turn thumbsticks into relative Vector3s to use on body
 	var rightUpperArmInput = _makeRelativeToCamera(topRightThumbstick) if !splitPlayers else _makeRelativeForSplit(topRightThumbstick, rightUpperArm)
 	var leftUpperArmInput = _makeRelativeToCamera(topLeftThumbstick) if !splitPlayers else _makeRelativeForSplit(topLeftThumbstick, leftUpperArm)
