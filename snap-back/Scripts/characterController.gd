@@ -3,7 +3,7 @@ extends Node3D
 # Physics values
 @export var upperArmMovementStrength = 1.5
 @export var calfMovementStrength = 5.0
-@export var heightToRunMaintenance = 0.83
+@export var heightToRunMaintenance = 0.95
 @export var uprightMaintenanceStrength = 65.0
 @export var rotationSpeed = 10.0
 @export var rotationDamping = 300.0
@@ -26,6 +26,10 @@ extends Node3D
 @export var maxUpperArmControlDistance = 0.3
 @export var maxCalfControlDistance = 0.3
 @export var triggerMaxReduction = 0.5
+var alternateArms: bool
+var alternateLegs: bool
+var lastBottomB: bool
+var lastBottomX: bool
 
 # Controllers (0 is controller 1, 1 is controller 2, so on)
 @export var topController = 0
@@ -80,6 +84,7 @@ var camera: Camera3D
 
 # Misc
 var grounded: bool
+var groundedRayResult
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -121,8 +126,8 @@ func _physics_process(delta: float) -> void:
 	# Hit only layer 4 (4th bit position for 4th layer, 1000 in binary == 8 in decimal)
 	query.collision_mask = 8
 	var space = get_world_3d().direct_space_state
-	var result = space.intersect_ray(query)
-	grounded = result.size() > 0
+	groundedRayResult = space.intersect_ray(query)
+	grounded = groundedRayResult.size() > 0
 	# Series of function calls for handling physics and input
 	if grounded && !splitPlayers:
 		_keepUpright()
@@ -153,10 +158,14 @@ func _keepUpright() -> void:
 		return
 	axis = axis.normalized()
 	# Rotation direction * angle to rotate (stronger rotation when angle is higher) * additional strength
-	var correction = axis * angle * uprightMaintenanceStrength
+	var correction = axis * angle * uprightMaintenanceStrength # * (0.1 if angle < 10.0 else 1.0)
 	# Rotate torso, apply oppsoite rotation to pelvis to avoid spinning forever
 	topJoint.angular_velocity += correction
 	bottomJoint.angular_velocity -= correction
+	# If angle is close enough to being upright, keep character standing up
+	#if angle < 5.0:
+		#if groundedRayResult.position.y + 0.75 > bottomJoint.global_position.y:
+			#topJoint.linear_velocity += Vector3.UP * abs(groundedRayResult.position.y - bottomJoint.global_position.y)
 	
 
 # Reduce movement to make player slide less
@@ -186,11 +195,24 @@ func _rotateTowardTarget(target: Vector3, delta: float) -> void:
 
 # Get inputs and apply to limbs
 func _handlePlayerInput(delta: float) -> void:
-	# Read thumbstick inputs
+	# Read button inputs
+	var bottomA = Input.is_joy_button_pressed(bottomController, JOY_BUTTON_A)
+	var bottomB = Input.is_joy_button_pressed(bottomController, JOY_BUTTON_B)
+	var bottomX = Input.is_joy_button_pressed(bottomController, JOY_BUTTON_X)
+	var bottomY = Input.is_joy_button_pressed(bottomController, JOY_BUTTON_Y)
+	# Read thumbstick inputs, use buttons if they're being pressed
 	var topRightThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
 	var topLeftThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
-	var bottomRightThumbstick = Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_Y))
-	var bottomLeftThumbstick = Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_Y))
+	var bottomRightThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_Y))
+		if !((bottomB || bottomX) && !alternateLegs) && !bottomY else Vector2((1.0 if bottomB else 0.0) + (-1.0 if bottomX else 0.0), (1.0 if bottomY else 0.0)))
+	var bottomLeftThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_Y))
+		if !((bottomB || bottomX) && alternateLegs) && !bottomY else Vector2((1.0 if bottomB else 0.0) + (-1.0 if bottomX else 0.0), (1.0 if bottomY else 0.0)))
+	# If button released, swap alternate variable
+	if (!bottomX && lastBottomX) || (!bottomB && lastBottomB):
+		alternateLegs = !alternateLegs
+	# Save last button values
+	lastBottomX = bottomX
+	lastBottomB = bottomB
 	# Turn thumbsticks into relative Vector3s to use on body
 	var rightUpperArmInput = _makeRelativeToCamera(topRightThumbstick) if !splitPlayers else _makeRelativeForSplit(topRightThumbstick, rightUpperArm)
 	var leftUpperArmInput = _makeRelativeToCamera(topLeftThumbstick) if !splitPlayers else _makeRelativeForSplit(topLeftThumbstick, leftUpperArm)
@@ -269,7 +291,8 @@ func _handlePlayerInput(delta: float) -> void:
 	# If any form of leg input change is present, raise character up to prevent impact on floor
 	if !splitPlayers && grounded:
 		var inputChange = abs(rightCalfInputChange.length()) + abs(leftCalfInputChange.length())
-		bottomJoint.linear_velocity += Vector3.UP * inputChange * 9.81 / 2.0
+		if (inputChange > 0):
+			bottomJoint.linear_velocity += Vector3.UP * inputChange * 9.81 / 2.0
 	# Save thumbstick positions for use on next tick
 	lastLeftCalfInput = leftCalfInput
 	lastRightCalfInput = rightCalfInput
