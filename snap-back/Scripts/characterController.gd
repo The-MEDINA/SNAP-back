@@ -30,6 +30,22 @@ var alternateArms: bool
 var alternateLegs: bool
 var lastBottomB: bool
 var lastBottomX: bool
+# Variables used for holding buttons
+var buttonHoldRequiredTime = 0.15
+var buttonHoldInterval = 0.1
+# Array for timers: [xButtonTimer, xButtonIntervalTimer] repeated
+var buttonHoldTimers = []
+# Enum for buttons, these are the index values used for buttonHoldTimers
+enum HeldButtonID {
+	BottomA = 0,
+	BottomB = 2,
+	BottomX = 4,
+	BottomY = 6,
+	TopA = 8,
+	TopB = 10,
+	TopX = 12,
+	TopY = 14
+}
 
 # Controllers (0 is controller 1, 1 is controller 2, so on)
 @export var topController = 0
@@ -118,6 +134,10 @@ func _ready() -> void:
 	if singlePlayer:
 		topController = 999
 		print('Controlling bottom')
+	# Initialize held button array
+	for i in 8:
+		buttonHoldTimers.append(buttonHoldRequiredTime)
+		buttonHoldTimers.append(buttonHoldInterval)
 
 # Runs on physics tick
 func _physics_process(delta: float) -> void:
@@ -204,9 +224,11 @@ func _handlePlayerInput(delta: float) -> void:
 	var topRightThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
 	var topLeftThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
 	var bottomRightThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_Y))
-		if !((bottomB || bottomX) && !alternateLegs) && !bottomY else Vector2((1.0 if bottomB else 0.0) + (-1.0 if bottomX else 0.0), (1.0 if bottomY else 0.0)))
+		if !((bottomB || bottomX) && !alternateLegs) && !bottomY else
+		Vector2(_buttonHeld(bottomB, HeldButtonID.BottomB, delta) - _buttonHeld(bottomX, HeldButtonID.BottomX, delta), (1.0 if bottomY else 0.0)))
 	var bottomLeftThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_Y))
-		if !((bottomB || bottomX) && alternateLegs) && !bottomY else Vector2((1.0 if bottomB else 0.0) + (-1.0 if bottomX else 0.0), (1.0 if bottomY else 0.0)))
+		if !((bottomB || bottomX) && alternateLegs) && !bottomY else
+		Vector2(_buttonHeld(bottomB, HeldButtonID.BottomB, delta) - _buttonHeld(bottomX, HeldButtonID.BottomX, delta), (1.0 if bottomY else 0.0)))
 	# If button released, swap alternate variable
 	if (!bottomX && lastBottomX) || (!bottomB && lastBottomB):
 		alternateLegs = !alternateLegs
@@ -298,6 +320,25 @@ func _handlePlayerInput(delta: float) -> void:
 	lastRightCalfInput = rightCalfInput
 	lastLeftUpperArmInput = leftUpperArmInput
 	lastRightUpperArmInput = rightUpperArmInput
+
+# Handle holding down a button and alternating between 0 and 1
+func _buttonHeld(heldButton: bool, id: HeldButtonID, delta: float) -> float:
+	# Button held, check overall timer
+	if heldButton:
+		if buttonHoldTimers[id] > buttonHoldRequiredTime:
+			buttonHoldTimers[id] -= delta
+			return 1.0
+		# Overall timer done, swap between true and false
+		else:
+			# Reset timer if needed, then figure out input
+			if buttonHoldTimers[id + 1] <= 0.0:
+				buttonHoldTimers[id + 1] = buttonHoldInterval * 2.0
+			buttonHoldTimers[id + 1] -= delta
+			return 1.0 if buttonHoldTimers[id + 1] > buttonHoldInterval else 0.0
+	# Button not pressed, reset timers
+	buttonHoldTimers[id] = buttonHoldRequiredTime
+	buttonHoldTimers[id + 1] = buttonHoldInterval * 2.0
+	return 0.0
 
 # Apply a saved offset, accounting for rotation
 func _makeRelativeToBase(baseJoint: PhysicalBone3D, offset: Vector3) -> Vector3:
