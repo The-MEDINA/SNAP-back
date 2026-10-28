@@ -3,17 +3,17 @@ extends Node3D
 # Physics values
 @export var upperArmMovementStrength = 1.5
 @export var calfMovementStrength = 5.0
-@export var heightToRunMaintenance = 0.95
+@export var heightToRunMaintenance = 0.85
 @export var uprightMaintenanceStrength = 65.0
 @export var rotationSpeed = 10.0
-@export var rotationDamping = 300.0
-@export var bodyDamping = 0.7
+@export var rotationDamping = 600.0
+@export var bodyDamping = 0.8
 
 # Movement values
 @export var upwardCalfMovementMultiplier = 1.5
 @export var upwardCalfSplitMovementMultiplier = 0.5
 @export var calfMovementMultiplier = 250.0
-@export var calfSplitMovementMultiplier = 25.0
+@export var calfSplitMovementMultiplier = 30.0
 @export var upperArmSplitMovementMultiplier = 10.0
 @export var distanceForMaxSplitDiagonalMovement = 3.0
 
@@ -31,8 +31,8 @@ var alternateLegs: bool
 var lastBottomB: bool
 var lastBottomX: bool
 # Variables used for holding buttons
-var buttonHoldRequiredTime = 0.15
-var buttonHoldInterval = 0.1
+var buttonHoldRequiredTime = 0.5
+var buttonHoldInterval = 0.25
 # Array for timers: [xButtonTimer, xButtonIntervalTimer] repeated
 var buttonHoldTimers = []
 # Enum for buttons, these are the index values used for buttonHoldTimers
@@ -137,7 +137,7 @@ func _ready() -> void:
 	# Initialize held button array
 	for i in 8:
 		buttonHoldTimers.append(buttonHoldRequiredTime)
-		buttonHoldTimers.append(buttonHoldInterval)
+		buttonHoldTimers.append(buttonHoldInterval * 2.0)
 
 # Runs on physics tick
 func _physics_process(delta: float) -> void:
@@ -149,21 +149,22 @@ func _physics_process(delta: float) -> void:
 	groundedRayResult = space.intersect_ray(query)
 	grounded = groundedRayResult.size() > 0
 	# Series of function calls for handling physics and input
+	_handlePlayerInput(delta)
 	if grounded && !splitPlayers:
+		_rotateTowardTarget(otherPlayer.global_position, delta)
 		_keepUpright()
 		_reduceMovement()
-		_rotateTowardTarget(otherPlayer.global_position, delta)
 		_setTopTransform()
 	if splitPlayers:
 		_tryReconnect(delta)
-	_handlePlayerInput(delta)
 	# Update safety timer if need be
 	if safetyTimer > 0.0:
 		safetyTimer -= delta
 		if safetyTimer < 0.0:
 			safetyTimer = 0.0
 	# Update parent
-	global_position = (bottomJoint.global_position + topJoint.global_position) / 2.0
+	if !splitPlayers || (splitPlayers && otherPlayer.splitPlayers):
+		global_position = (bottomJoint.global_position + topJoint.global_position) / 2.0
 
 # Keep the body upright
 func _keepUpright() -> void:
@@ -229,9 +230,6 @@ func _handlePlayerInput(delta: float) -> void:
 	var bottomLeftThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_Y))
 		if !((bottomB || bottomX) && alternateLegs) && !bottomY else
 		Vector2(_buttonHeld(bottomB, HeldButtonID.BottomB, delta) - _buttonHeld(bottomX, HeldButtonID.BottomX, delta), (1.0 if bottomY else 0.0)))
-	# If button released, swap alternate variable
-	if (!bottomX && lastBottomX) || (!bottomB && lastBottomB):
-		alternateLegs = !alternateLegs
 	# Save last button values
 	lastBottomX = bottomX
 	lastBottomB = bottomB
@@ -333,12 +331,24 @@ func _buttonHeld(heldButton: bool, id: HeldButtonID, delta: float) -> float:
 			# Reset timer if needed, then figure out input
 			if buttonHoldTimers[id + 1] <= 0.0:
 				buttonHoldTimers[id + 1] = buttonHoldInterval * 2.0
+				# Alternate variable if needed
+				_alternateFaceButtonVariable(id)
 			buttonHoldTimers[id + 1] -= delta
 			return 1.0 if buttonHoldTimers[id + 1] > buttonHoldInterval else 0.0
-	# Button not pressed, reset timers
-	buttonHoldTimers[id] = buttonHoldRequiredTime
-	buttonHoldTimers[id + 1] = buttonHoldInterval * 2.0
-	return 0.0
+	else:
+		# Button not pressed, alternate variable if needed and reset timers
+		if buttonHoldTimers[id] < buttonHoldInterval && buttonHoldTimers[id] > 0:
+			_alternateFaceButtonVariable(id)
+		buttonHoldTimers[id] = buttonHoldRequiredTime
+		buttonHoldTimers[id + 1] = buttonHoldInterval * 2.0
+		return 0.0
+
+# Alternate face button variable based on button ID
+func _alternateFaceButtonVariable(id: HeldButtonID):
+	if id == HeldButtonID.BottomB || id == HeldButtonID.BottomX:
+		alternateLegs = !alternateLegs
+	elif id == HeldButtonID.TopB || id == HeldButtonID.TopX:
+		alternateArms = !alternateArms
 
 # Apply a saved offset, accounting for rotation
 func _makeRelativeToBase(baseJoint: PhysicalBone3D, offset: Vector3) -> Vector3:
