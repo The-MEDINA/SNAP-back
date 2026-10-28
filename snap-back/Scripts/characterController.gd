@@ -118,6 +118,17 @@ func _ready() -> void:
 	if singlePlayer:
 		topController = 999
 		print('Controlling bottom')
+		
+	# grab the correct controllers in multiplayer
+	else:
+		# char1
+		if (topController == 0):
+			topController = PlayerData.character_selections["char1"]["top_player_id"]
+			bottomController = PlayerData.character_selections["char1"]["bottom_player_id"]
+		# char2
+		else:
+			topController = PlayerData.character_selections["char2"]["top_player_id"]
+			bottomController = PlayerData.character_selections["char2"]["bottom_player_id"]
 
 # Runs on physics tick
 func _physics_process(delta: float) -> void:

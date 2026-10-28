@@ -110,6 +110,7 @@ shape = SubResource("BoxShape3D_5ti0k")
 [node name="Character" type="Node3D" parent="." unique_id=2122778959 node_paths=PackedStringArray("otherPlayer")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4025886, 0.038232327, 0)
 script = ExtResource("3_gg4yg")
+singlePlayer = false
 otherPlayer = NodePath("../Character2")
 
 [node name="Bottom" parent="Character" unique_id=623702786 instance=ExtResource("4_gg4yg")]
@@ -131,6 +132,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3823717, 0.02783084, 0)
 script = ExtResource("3_gg4yg")
 topController = 1
 bottomController = 1
+singlePlayer = false
 otherPlayer = NodePath("../Character")
 
 [node name="Bottom" parent="Character2" unique_id=190974490 instance=ExtResource("4_gg4yg")]

@@ -30,7 +30,7 @@ func save_selections(c1_top: Mesh, c1_bottom: Mesh, c2_top: Mesh, c2_bottom: Mes
 
 func change_controllers(device_to_player: Array[int]):
 	character_selections["char1"]["top_player_id"] = device_to_player[0];
-	character_selections["char1"]["bottom_player_id"] = device_to_player[0];
-	character_selections["char2"]["top_player_id"] = device_to_player[0];
-	character_selections["char2"]["bottom_player_id"] = device_to_player[0];
+	character_selections["char1"]["bottom_player_id"] = device_to_player[1];
+	character_selections["char2"]["top_player_id"] = device_to_player[2];
+	character_selections["char2"]["bottom_player_id"] = device_to_player[3];
 	return
