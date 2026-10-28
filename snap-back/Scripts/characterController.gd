@@ -1,3 +1,7 @@
+# Punching: Press button to add force in opposite direction, release button to add force in direction
+# Try adding force to forearm when input is detected for arms
+# Try applying some constant forward-upward force to forearms to allow blocking & get rid of "goopy" stance
+
 extends Node3D
 
 # Physics values
