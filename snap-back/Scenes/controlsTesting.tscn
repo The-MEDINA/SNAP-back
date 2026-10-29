@@ -114,6 +114,7 @@ leftLegPose = Vector2(1, 0)
 rightLegPose = Vector2(0, 1)
 leftArmPose = Vector2(1, 0)
 rightArmPose = Vector2(0, 1)
+singlePlayer = false
 otherPlayer = NodePath("../Character2")
 
 [node name="Bottom" parent="Character" unique_id=623702786 instance=ExtResource("4_gg4yg")]
