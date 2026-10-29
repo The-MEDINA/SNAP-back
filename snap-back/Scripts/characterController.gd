@@ -1,5 +1,3 @@
-# Punching: Press button to add force in opposite direction, release button to add force in direction
-# Try adding force to forearm when input is detected for arms
 # Try applying some constant forward-upward force to forearms to allow blocking & get rid of "goopy" stance
 
 extends Node3D
@@ -30,26 +28,39 @@ extends Node3D
 @export var maxUpperArmControlDistance = 0.3
 @export var maxCalfControlDistance = 0.3
 @export var triggerMaxReduction = 0.5
-var alternateArms: bool
 var alternateLegs: bool
 var lastBottomB: bool
 var lastBottomX: bool
-# Variables used for holding buttons
-var buttonHoldRequiredTime = 0.5
-var buttonHoldInterval = 0.25
-# Array for timers: [xButtonTimer, xButtonIntervalTimer] repeated
-var buttonHoldTimers = []
-# Enum for buttons, these are the index values used for buttonHoldTimers
+# Variables used for holding leg buttons
+var legButtonHoldRequiredTime = 0.3
+var legButtonHoldInterval = 0.15
+# Array for timers: [xButtonTimer, xButtonIntervalTimer] repeated, used for leg movement
+var legStates = []
+# Enum for buttons, these are the index values used for legStates
 enum HeldButtonID {
 	BottomA = 0,
-	BottomB = 2,
-	BottomX = 4,
-	BottomY = 6,
-	TopA = 8,
-	TopB = 10,
-	TopX = 12,
-	TopY = 14
+	BottomB = 1,
+	BottomX = 2,
+	BottomY = 3,
+	TopA = 4,
+	TopB = 5,
+	TopX = 6,
+	TopY = 7
 }
+# Time values for arms
+var minArmReleaseTime = 0.25
+var maxArmReleaseTime = 1.0
+# The higher this number is, the shorter you need to hold a punch button to extend punch length
+var armHeldTimeMultiplier = 2.0
+var armStates = []
+
+# Special pose inputs
+@export var leftLegPose: Vector2
+@export var rightLegPose: Vector2
+@export var leftArmPose: Vector2
+@export var rightArmPose: Vector2
+# Forgiveness: How close to the pose must thumbstick inputs be (dot product) (won't matter for face button)
+@export var inputPoseForgiveness = 0.85
 
 # Controllers (0 is controller 1, 1 is controller 2, so on)
 @export var topController = 0
@@ -79,6 +90,8 @@ var rightCalf: PhysicalBone3D
 var leftCalf: PhysicalBone3D
 var rightUpperArm: PhysicalBone3D
 var leftUpperArm: PhysicalBone3D
+var rightForearm: PhysicalBone3D
+var leftForearm: PhysicalBone3D
 
 # Offsets used for base bone positions
 var rightUpperArmOffset: Vector3
@@ -126,6 +139,8 @@ func _ready() -> void:
 	leftCalf = bottomBoneSim.get_node('Physical Bone CalfL') as PhysicalBone3D
 	rightUpperArm = topBoneSim.get_node('Physical Bone UpperArmR') as PhysicalBone3D
 	leftUpperArm = topBoneSim.get_node('Physical Bone UpperArmL') as PhysicalBone3D
+	rightForearm = topBoneSim.get_node('Physical Bone ForearmR') as PhysicalBone3D
+	leftForearm = topBoneSim.get_node('Physical Bone ForearmL') as PhysicalBone3D
 	# Get offsets for limbs (in local space of base joints)
 	rightUpperArmOffset = topJoint.global_transform.basis.inverse() * (rightUpperArm.global_position - topJoint.global_position)
 	leftUpperArmOffset = topJoint.global_transform.basis.inverse() * (leftUpperArm.global_position - topJoint.global_position)
@@ -138,8 +153,7 @@ func _ready() -> void:
 	if singlePlayer:
 		topController = 999
 		print('Controlling bottom')
-		
-	# grab the correct controllers in multiplayer
+	# Grab the correct controllers in multiplayer
 	else:
 		# char1
 		if (topController == 0):
@@ -149,11 +163,18 @@ func _ready() -> void:
 		else:
 			topController = PlayerData.character_selections["char2"]["top_player_id"]
 			bottomController = PlayerData.character_selections["char2"]["bottom_player_id"]
-			
-	# Initialize held button array
-	for i in 8:
-		buttonHoldTimers.append(buttonHoldRequiredTime)
-		buttonHoldTimers.append(buttonHoldInterval * 2.0)
+	# Initialize held button array for legs
+	for i in 2:
+		legStates.append(legButtonHoldRequiredTime)
+		legStates.append(legButtonHoldInterval * 2.0)
+	# Initialize states for arms
+	for i in 2:
+		armStates.append(minArmReleaseTime)
+	# Normalize pose inputs
+	leftLegPose = leftLegPose.normalized()
+	rightLegPose = rightLegPose.normalized()
+	leftArmPose = leftArmPose.normalized()
+	rightArmPose = rightArmPose.normalized()
 
 # Runs on physics tick
 func _physics_process(delta: float) -> void:
@@ -200,10 +221,9 @@ func _keepUpright() -> void:
 	topJoint.angular_velocity += correction
 	bottomJoint.angular_velocity -= correction
 	# If angle is close enough to being upright, keep character standing up
-	#if angle < 5.0:
-		#if groundedRayResult.position.y + 0.75 > bottomJoint.global_position.y:
-			#topJoint.linear_velocity += Vector3.UP * abs(groundedRayResult.position.y - bottomJoint.global_position.y)
-	
+	if angle < 5.0:
+		if groundedRayResult.position.y + 0.75 > bottomJoint.global_position.y:
+			topJoint.linear_velocity += Vector3.UP * abs(groundedRayResult.position.y - bottomJoint.global_position.y) * 0.5
 
 # Reduce movement to make player slide less
 func _reduceMovement() -> void:
@@ -237,15 +257,39 @@ func _handlePlayerInput(delta: float) -> void:
 	var bottomB = Input.is_joy_button_pressed(bottomController, JOY_BUTTON_B)
 	var bottomX = Input.is_joy_button_pressed(bottomController, JOY_BUTTON_X)
 	var bottomY = Input.is_joy_button_pressed(bottomController, JOY_BUTTON_Y)
+	var topA = Input.is_joy_button_pressed(topController, JOY_BUTTON_A)
+	var topB = Input.is_joy_button_pressed(topController, JOY_BUTTON_B)
+	var topX = Input.is_joy_button_pressed(topController, JOY_BUTTON_X)
+	var topY = Input.is_joy_button_pressed(topController, JOY_BUTTON_Y)
+	# Run punch button function regardless of input to keep timers running
+	var punchInput =  _armButtonHeld(topB, HeldButtonID.TopB, delta) - _armButtonHeld(topX, HeldButtonID.TopX, delta)
+	var legInput = Vector2(_legButtonHeld(bottomB, HeldButtonID.BottomB, delta) - _legButtonHeld(bottomX, HeldButtonID.BottomX, delta), (1.0 if bottomY else 0.0))
 	# Read thumbstick inputs, use buttons if they're being pressed
 	var topRightThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
+	if punchInput != 0.0:
+		topRightThumbstick.x = punchInput
 	var topLeftThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
+	if punchInput != 0.0:
+		topLeftThumbstick.x = punchInput
 	var bottomRightThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_Y))
-		if !((bottomB || bottomX) && !alternateLegs) && !bottomY else
-		Vector2(_buttonHeld(bottomB, HeldButtonID.BottomB, delta) - _buttonHeld(bottomX, HeldButtonID.BottomX, delta), (1.0 if bottomY else 0.0)))
+		if !((bottomB || bottomX) && !alternateLegs) && !bottomY else legInput)
 	var bottomLeftThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_Y))
-		if !((bottomB || bottomX) && alternateLegs) && !bottomY else
-		Vector2(_buttonHeld(bottomB, HeldButtonID.BottomB, delta) - _buttonHeld(bottomX, HeldButtonID.BottomX, delta), (1.0 if bottomY else 0.0)))
+		if !((bottomB || bottomX) && alternateLegs) && !bottomY else legInput)
+	# Pose buttons overwrite all
+	if topA:
+		topRightThumbstick = rightArmPose
+		topLeftThumbstick = leftArmPose
+	if bottomA:
+		bottomRightThumbstick = rightLegPose
+		bottomLeftThumbstick = leftLegPose
+	# Detect pose for arms
+	if topRightThumbstick.dot(rightArmPose) > inputPoseForgiveness && topLeftThumbstick.dot(leftArmPose) > inputPoseForgiveness:
+		print("ARM POSE")
+		pass
+	# Detect pose for legs
+	if bottomRightThumbstick.dot(rightLegPose) > inputPoseForgiveness && bottomLeftThumbstick.dot(leftLegPose) > inputPoseForgiveness:
+		print("LEG POSE")
+		pass
 	# Save last button values
 	lastBottomX = bottomX
 	lastBottomB = bottomB
@@ -278,10 +322,21 @@ func _handlePlayerInput(delta: float) -> void:
 	var splitCalfModifier = 0.15 if splitPlayers else 1.0
 	var rightCalfVelocity = _getVelocityToTarget(rightCalf.global_position, rightCalfTarget, calfMovementStrength)
 	var leftCalfVelocity = _getVelocityToTarget(leftCalf.global_position, leftCalfTarget, calfMovementStrength)
-	rightUpperArm.linear_velocity += _getVelocityToTarget(rightUpperArm.global_position, rightUpperArmTarget, upperArmMovementStrength) * splitArmModifier
-	leftUpperArm.linear_velocity += _getVelocityToTarget(leftUpperArm.global_position, leftUpperArmTarget, upperArmMovementStrength) * splitArmModifier
+	var rightUpperArmVelocity = _getVelocityToTarget(rightUpperArm.global_position, rightUpperArmTarget, upperArmMovementStrength) * splitArmModifier
+	var leftUpperArmVelocity = _getVelocityToTarget(leftUpperArm.global_position, leftUpperArmTarget, upperArmMovementStrength) * splitArmModifier
+	rightUpperArm.linear_velocity += rightUpperArmVelocity
+	leftUpperArm.linear_velocity +=  leftUpperArmVelocity
+	rightForearm.linear_velocity += rightUpperArmVelocity * 0.25
+	leftForearm.linear_velocity +=  leftUpperArmVelocity * 0.25
 	rightCalf.linear_velocity += rightCalfVelocity * splitCalfModifier
 	leftCalf.linear_velocity += leftCalfVelocity * splitCalfModifier
+	# Hardcoded block functionality
+	var blockVelocity = (Vector3.UP + topJoint.global_basis.y * 1.25).normalized() * delta * 30.0
+	if topY:
+		rightForearm.linear_velocity += blockVelocity
+		leftForearm.linear_velocity += blockVelocity
+		rightUpperArm.linear_velocity -= blockVelocity
+		leftUpperArm.linear_velocity -= blockVelocity
 	# If grounded, apply opposite of calf velocity average multipled by movement strength
 	if grounded && !splitPlayers:
 		bottomJoint.linear_velocity -= (rightCalfVelocity + leftCalfVelocity) / 2 * calfMovementStrength
@@ -335,36 +390,51 @@ func _handlePlayerInput(delta: float) -> void:
 	lastLeftUpperArmInput = leftUpperArmInput
 	lastRightUpperArmInput = rightUpperArmInput
 
-# Handle holding down a button and alternating between 0 and 1
-func _buttonHeld(heldButton: bool, id: HeldButtonID, delta: float) -> float:
+# Handle holding down a leg button, alternating between 0 and 1
+func _legButtonHeld(heldButton: bool, id: HeldButtonID, delta: float) -> float:
+	# Get index based on leg, only supports these 2 (can come up with more refined approach later)
+	var index = (0 if id == 1 else (2 if id == 2 else -1))
 	# Button held, check overall timer
 	if heldButton:
-		if buttonHoldTimers[id] > buttonHoldRequiredTime:
-			buttonHoldTimers[id] -= delta
+		if legStates[index] > legButtonHoldRequiredTime:
+			legStates[index] -= delta
 			return 1.0
 		# Overall timer done, swap between true and false
 		else:
 			# Reset timer if needed, then figure out input
-			if buttonHoldTimers[id + 1] <= 0.0:
-				buttonHoldTimers[id + 1] = buttonHoldInterval * 2.0
+			if legStates[index + 1] <= 0.0:
+				legStates[index + 1] = legButtonHoldInterval * 2.0
 				# Alternate variable if needed
 				_alternateFaceButtonVariable(id)
-			buttonHoldTimers[id + 1] -= delta
-			return 1.0 if buttonHoldTimers[id + 1] > buttonHoldInterval else 0.0
+			legStates[index + 1] -= delta
+			return 1.0 if legStates[index + 1] > legButtonHoldInterval else 0.0
 	else:
 		# Button not pressed, alternate variable if needed and reset timers
-		if buttonHoldTimers[id] < buttonHoldInterval && buttonHoldTimers[id] > 0:
+		if legStates[index] < legButtonHoldInterval && legStates[index] > 0:
 			_alternateFaceButtonVariable(id)
-		buttonHoldTimers[id] = buttonHoldRequiredTime
-		buttonHoldTimers[id + 1] = buttonHoldInterval * 2.0
+		legStates[index] = legButtonHoldRequiredTime
+		legStates[index + 1] = legButtonHoldInterval * 2.0
 		return 0.0
+
+# Handle holding down an arm button, outputting -1, and, upon release, outputting 1 for a bit
+func _armButtonHeld(heldButton: bool, id: HeldButtonID, delta: float) -> float:
+	# Get index based on arm, only supports these 2 (can come up with more refined approach later)
+	var index = (0 if id == 5 else (1 if id == 6 else -1))
+	# If button held
+	if heldButton:
+		armStates[index] = clampf(armStates[index] + delta * armHeldTimeMultiplier, minArmReleaseTime, maxArmReleaseTime)
+		return -1.0
+	# If button released and timer must run
+	if !heldButton && armStates[index] > minArmReleaseTime:
+		armStates[index] = clampf(armStates[index] - delta, minArmReleaseTime, maxArmReleaseTime)
+		return 1.0
+	# Nothing is happening
+	return 0.0
 
 # Alternate face button variable based on button ID
 func _alternateFaceButtonVariable(id: HeldButtonID):
 	if id == HeldButtonID.BottomB || id == HeldButtonID.BottomX:
 		alternateLegs = !alternateLegs
-	elif id == HeldButtonID.TopB || id == HeldButtonID.TopX:
-		alternateArms = !alternateArms
 
 # Apply a saved offset, accounting for rotation
 func _makeRelativeToBase(baseJoint: PhysicalBone3D, offset: Vector3) -> Vector3:

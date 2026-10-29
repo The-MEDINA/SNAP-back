@@ -110,7 +110,10 @@ shape = SubResource("BoxShape3D_5ti0k")
 [node name="Character" type="Node3D" parent="." unique_id=2122778959 node_paths=PackedStringArray("otherPlayer")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4025886, 0.038232327, 0)
 script = ExtResource("3_gg4yg")
-singlePlayer = false
+leftLegPose = Vector2(1, 0)
+rightLegPose = Vector2(0, 1)
+leftArmPose = Vector2(1, 0)
+rightArmPose = Vector2(0, 1)
 otherPlayer = NodePath("../Character2")
 
 [node name="Bottom" parent="Character" unique_id=623702786 instance=ExtResource("4_gg4yg")]
@@ -130,6 +133,10 @@ angular_limit_z/softness = 16.0
 [node name="Character2" type="Node3D" parent="." unique_id=2017855393 node_paths=PackedStringArray("otherPlayer")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3823717, 0.02783084, 0)
 script = ExtResource("3_gg4yg")
+leftLegPose = Vector2(1, 0)
+rightLegPose = Vector2(0, 1)
+leftArmPose = Vector2(1, 0)
+rightArmPose = Vector2(0, 1)
 topController = 1
 bottomController = 1
 singlePlayer = false

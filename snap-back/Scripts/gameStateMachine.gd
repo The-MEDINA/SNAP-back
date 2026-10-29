@@ -39,7 +39,6 @@ var lastPhysicsState = false
 # Initial value setup
 func _ready() -> void:
 	currentState = GameState.GAME_WAITING
-	print('Controls\n3 >> Start game\n4 >> Pause game')
 	debugLabel.text = 'Controls\n3 >> Start game\n4 >> Pause game'
 	PhysicsServer3D.set_active(false)
 	return
@@ -97,12 +96,10 @@ func _gameCountdown(delta: float) -> void:
 	if gameCountdownTimer <= 0.0:
 		gameCountdownTimer = 0.0
 		currentState = GameState.GAME
-		print('Game started!')
 		debugLabel.text = 'Game started!'
 		lastPhysicsState = true
 		PhysicsServer3D.set_active(true)
 		return
-	print('Game Countdown: ' + str(snappedf(gameCountdownTimer, 0.1)))
 	debugLabel.text = 'Game Countdown: ' + str(snappedf(gameCountdownTimer, 0.1))
 	return
 
@@ -113,7 +110,6 @@ func _game() -> void:
 		player2Timer = _getPlayerTimer(player2Outs)
 		currentState = GameState.PLAYER_DOWN
 		return
-	print('Main game state! P1 outs: ' + str(player1Outs) + ' || P2 outs: ' + str(player2Outs))
 	debugLabel.text = 'Main game state! P1 outs: ' + str(player1Outs) + ' || P2 outs: ' + str(player2Outs)
 	return
 
@@ -124,7 +120,6 @@ func _playerDown(delta: float) -> void:
 		player1Timer = _getPlayerTimer(player1Outs)
 		player2Timer = _getPlayerTimer(player2Outs)
 		lastPlayerDown = 0
-		print('Both players down!')
 		debugLabel.text = 'Both players down!'
 		return
 	# Player 1 timer
@@ -137,7 +132,6 @@ func _playerDown(delta: float) -> void:
 			player1Win = false
 			currentState = GameState.GAME_OVER
 			return
-		print('Player 1 timer: ' + str(snappedf(player1Timer, 0.1)) + ' (Outs: ' + str(player1Outs) + ')')
 		debugLabel.text = 'Player 1 timer: ' + str(snappedf(player1Timer, 0.1)) + ' (Outs: ' + str(player1Outs) + ')'
 		return
 	# Player 2 timer
@@ -150,7 +144,6 @@ func _playerDown(delta: float) -> void:
 			player1Win = true
 			currentState = GameState.GAME_OVER
 			return
-		print('Player 2 timer: ' + str(snappedf(player2Timer, 0.1)) + ' (Outs: ' + str(player2Outs) + ')')
 		debugLabel.text = 'Player 2 timer: ' + str(snappedf(player2Timer, 0.1)) + ' (Outs: ' + str(player2Outs) + ')'
 		return
 	# Nobody is down, add out to last player to reconnect. If both players reconnect on the same frame, no outs are added. Then resume game
@@ -163,7 +156,6 @@ func _playerDown(delta: float) -> void:
 
 # Logic for the game being over
 func _gameOver() -> void:
-	print('Game over! Player ' + ('ONE' if player1Win else 'TWO') + ' wins!')
 	debugLabel.text = 'Game over! Player ' + ('ONE' if player1Win else 'TWO') + ' wins!'
 	PhysicsServer3D.set_active(false)
 	return
@@ -174,7 +166,6 @@ func _paused() -> void:
 		currentState = resumeState
 		PhysicsServer3D.set_active(lastPhysicsState)
 		return
-	print('Game paused')
 	debugLabel.text = 'Game paused'
 	return
 
