@@ -5,8 +5,8 @@ extends Control
 @export var bottom_options: Array[PartOption] = []
 
 # Character 1 Node References (P1 = Top, P2 = Bottom) 
-@onready var c1_top_mesh: MeshInstance3D = $MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1/TopMesh
 @onready var c1_bottom_mesh: MeshInstance3D = $MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1/BottomMesh
+@onready var c1_top_mesh: MeshInstance3D = $MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1/TopMesh
 
 @onready var p1_controller_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/Top1
 @onready var p1_name_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/TopNameLabel1
@@ -88,7 +88,6 @@ func cycle_selection(player_id: int, direction: int) -> void:
 
 	selected_indices[player_id] = (selected_indices[player_id] + direction + options_count) % options_count
 	update_player_ui(player_id)
-
 func update_player_ui(player_id: int) -> void:
 	var index: int = selected_indices[player_id]
 
@@ -124,7 +123,7 @@ func toggle_ready(player_id: int) -> void:
 	if not player_ready.has(false):
 		print("All players locked in! Saving data...")
 		
-		# Retrieve selected meshes
+		# Retrieve selected Mesh resources
 		var c1_top = top_options[selected_indices[0]].mesh
 		var c1_bottom = bottom_options[selected_indices[1]].mesh
 		var c2_top = top_options[selected_indices[2]].mesh
@@ -142,40 +141,29 @@ func toggle_ready(player_id: int) -> void:
 func swap_players(device_id: int, direction: String):
 	print("device ", device_id, " moving ", direction)
 	
-	# grab player at device index
 	var first_player = device_to_player[device_id]
-	
-	# find the player we want to swap with
 	var second_player = device_to_player[device_id]
 	if (direction == "left"):
-		second_player -= 2;
-		pass
+		second_player -= 2
 	elif (direction == "right"):
-		second_player += 2;
-		pass
+		second_player += 2
 	elif (direction == "up"):
-		second_player -= 1;
-		pass
+		second_player -= 1
 	elif (direction == "down"):
 		second_player += 1
-		pass
+
 	if second_player > 3: second_player -= 4
 	if second_player < 0: second_player += 4
 	
-	# find the player in the array
-	var second_player_index;
+	var second_player_index: int = 0
 	for i in 4:
 		if device_to_player[i] == second_player:
 			second_player_index = i
-			pass
-	
-	# move players around
+
 	device_to_player[device_id] = second_player
 	device_to_player[second_player_index] = first_player
-	pass
 
 func _unhandled_input(event: InputEvent) -> void:
-	# testing
 	if (event.is_action_pressed("LeftTrigger") ||
 	event.is_action_pressed("RightTrigger") ||
 	event.is_action_pressed("Select")
@@ -186,12 +174,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif Input.is_action_just_pressed_by_event("RightTrigger", event): cycle_selection(device_to_player[event.device], 1)
 	elif event.is_action_pressed("Select"): toggle_ready(device_to_player[event.device])
 	
-	# elif event.is_action_released("LeftThumbstickLeft"): swap_players(event.device, "left")
 	elif Input.is_action_just_pressed_by_event("LeftThumbstickLeft", event): swap_players(event.device, "left")
 	elif Input.is_action_just_pressed_by_event("LeftThumbstickRight", event): swap_players(event.device, "right")
 	elif Input.is_action_just_pressed_by_event("LeftThumbstickUp", event): swap_players(event.device, "up")
 	elif Input.is_action_just_pressed_by_event("LeftThumbstickDown", event): swap_players(event.device, "down")
-	# elif event.is_action_pressed("LeftThumbstickDown"): swap_players(event.device, "down")
 	
 	# update labels
 	p1_controller_label.text = "Top (Device " + str(device_to_player.find(0)) + ")"

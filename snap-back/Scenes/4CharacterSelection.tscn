@@ -2,26 +2,20 @@
 
 [ext_resource type="Script" uid="uid://cyf5wa6ark7f4" path="res://Scripts/4_character_selection.gd" id="1_rkapk"]
 [ext_resource type="Script" uid="uid://11cu0aac0dfw" path="res://Scripts/PartOption.gd" id="2_g8vv5"]
-[ext_resource type="Resource" uid="uid://c56xo8x6k5ylc" path="res://Scripts/top_blue.tres" id="3_54b3v"]
-[ext_resource type="Resource" uid="uid://bbj2hs6n4bety" path="res://Scripts/top_red.tres" id="4_3h6c6"]
-[ext_resource type="Resource" uid="uid://dtqyaali3ompi" path="res://Scripts/bottom_blue.tres" id="5_x2wrf"]
-[ext_resource type="Resource" uid="uid://djmp61karosc1" path="res://Scripts/bottom_red.tres" id="6_a5c7b"]
+[ext_resource type="Resource" uid="uid://c56xo8x6k5ylc" path="res://Scripts/top_blue.tres" id="4_x2wrf"]
+[ext_resource type="Resource" uid="uid://c57gwhiqjj1ka" path="res://Character/Fireball.tres" id="5_3h6c6"]
+[ext_resource type="Resource" uid="uid://bbj2hs6n4bety" path="res://Scripts/top_red.tres" id="5_a5c7b"]
 [ext_resource type="Script" uid="uid://bk758eu6a67ud" path="res://Scripts/4CharacterController.gd" id="7_54b3v"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_8pm45"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_l20t0"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_g8vv5"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_54b3v"]
+[ext_resource type="Resource" uid="uid://dtqyaali3ompi" path="res://Scripts/bottom_blue.tres" id="7_rqetd"]
+[ext_resource type="Resource" uid="uid://djmp61karosc1" path="res://Scripts/bottom_red.tres" id="8_16cy8"]
+[ext_resource type="Resource" uid="uid://ds4vss5qa4bxr" path="res://Character/Fireball_Bottom.tres" id="8_x2wrf"]
 
 [node name="CharacterSelect" type="Control" unique_id=480896808]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_rkapk")
-top_options = Array[ExtResource("2_g8vv5")]([ExtResource("3_54b3v"), ExtResource("4_3h6c6")])
-bottom_options = Array[ExtResource("2_g8vv5")]([ExtResource("5_x2wrf"), ExtResource("6_a5c7b")])
+top_options = Array[ExtResource("2_g8vv5")]([ExtResource("5_3h6c6"), ExtResource("4_x2wrf"), ExtResource("5_a5c7b")])
+bottom_options = Array[ExtResource("2_g8vv5")]([ExtResource("8_x2wrf"), ExtResource("7_rqetd"), ExtResource("8_16cy8")])
 
 [node name="MainHBoxContainer" type="HBoxContainer" parent="." unique_id=1041881688]
 layout_mode = 1
@@ -169,13 +163,10 @@ transform = Transform3D(1, 0, 0, 0, 0.9848077, 0.17364818, 0, -0.17364818, 0.984
 [node name="Character1" type="Skeleton3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport/Node3D" unique_id=2122662245]
 script = ExtResource("7_54b3v")
 
-[node name="TopMesh" type="MeshInstance3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1" unique_id=628999470]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
-mesh = SubResource("BoxMesh_8pm45")
+[node name="TopMesh" type="MeshInstance3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1" unique_id=1984217696]
 
-[node name="BottomMesh" type="MeshInstance3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1" unique_id=1725233504]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("BoxMesh_l20t0")
+[node name="BottomMesh" type="MeshInstance3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1" unique_id=756435030]
+visible = false
 
 [node name="MainHBoxContainer2" type="HBoxContainer" parent="." unique_id=339947473]
 layout_mode = 1
@@ -213,13 +204,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13952637, 0, 0)
 script = ExtResource("7_54b3v")
 character_key = "char2"
 
-[node name="TopMesh" type="MeshInstance3D" parent="MainHBoxContainer2/SubViewportContainer/SubViewport/Node3D/Character2" unique_id=784841451]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
-mesh = SubResource("BoxMesh_g8vv5")
+[node name="TopMesh" type="MeshInstance3D" parent="MainHBoxContainer2/SubViewportContainer/SubViewport/Node3D/Character2" unique_id=1282026004]
 
-[node name="BottomMesh" type="MeshInstance3D" parent="MainHBoxContainer2/SubViewportContainer/SubViewport/Node3D/Character2" unique_id=585283097]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("BoxMesh_54b3v")
+[node name="BottomMesh" type="MeshInstance3D" parent="MainHBoxContainer2/SubViewportContainer/SubViewport/Node3D/Character2" unique_id=1357449895]
 
 [node name="PanelContainer" type="PanelContainer" parent="MainHBoxContainer2" unique_id=378444203]
 layout_mode = 2

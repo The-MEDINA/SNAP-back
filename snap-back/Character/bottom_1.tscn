@@ -33,13 +33,13 @@ height = 0.40003902
 [node name="Bottom1" unique_id=623702786 instance=ExtResource("1_3jd42")]
 script = ExtResource("2_bcssu")
 
-[node name="PhysicalBoneSimulator3D" type="PhysicalBoneSimulator3D" parent="ArmatureBottom/Skeleton3D" parent_id_path=PackedInt32Array(1387098820) index="1" unique_id=811698593]
+[node name="PhysicalBoneSimulator3D" type="PhysicalBoneSimulator3D" parent="ArmatureBottom/Skeleton3D" parent_id_path=PackedInt32Array(2006970806) index="1" unique_id=811698593]
 
 [node name="Physical Bone RootHip" type="PhysicalBone3D" parent="ArmatureBottom/Skeleton3D/PhysicalBoneSimulator3D" index="0" unique_id=689068339]
-transform = Transform3D(0.08975667, -0.99596375, -3.2997144e-07, -1.4022899e-05, -1.5950582e-06, 1, -0.99596375, -0.08975667, -1.4109465e-05, 1.0742895e-08, -0.055213884, 0.02947798)
+transform = Transform3D(0.08975667, -0.99596375, -3.3180797e-07, -1.4002438e-05, -1.5950582e-06, 1, -0.99596375, -0.08975667, -1.4089087e-05, 1.0742895e-08, -0.055213884, 0.02947798)
 visible = false
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.730099e-09, 6.7055863e-09, 0.013876021)
-body_offset = Transform3D(1, -5.9604645e-08, -4.129497e-07, -4.129497e-07, 3.3523975e-09, -1, 0, 1, 3.3512606e-09, 0, 0.013876021, -6.7520887e-09)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.0140275e-09, 6.7055863e-09, 0.013876021)
+body_offset = Transform3D(1, -5.9604645e-08, -4.3341151e-07, -4.3341151e-07, 3.3523975e-09, -1, 0, 1, 3.3512606e-09, 0, 0.013876021, -6.7520887e-09)
 mass = 0.5
 angular_damp_mode = 1
 angular_damp = 100.0
@@ -50,10 +50,10 @@ transform = Transform3D(1, -9.094947e-12, 0, 0, -4.3705427e-08, 1, 2.582965e-10,
 shape = SubResource("BoxShape3D_wfeev")
 
 [node name="Physical Bone HipL" type="PhysicalBone3D" parent="ArmatureBottom/Skeleton3D/PhysicalBoneSimulator3D" index="1" unique_id=145298632]
-transform = Transform3D(-4.598264e-08, -1.6244303e-07, -1, 0.99596256, 0.08977063, -6.03796e-08, 0.08977063, -0.99596256, 1.5765926e-07, 0.045594558, -0.069089904, 0.02947818)
+transform = Transform3D(-4.598264e-08, -1.618036e-07, -1, 0.99596256, 0.08977063, -6.0322186e-08, 0.08977063, -0.99596256, 1.5702241e-07, 0.045594558, -0.069089904, 0.02947818)
 joint_type = 3
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.1437437e-10, 7.542732e-09, 0.04559455)
-body_offset = Transform3D(1, -4.5448542e-07, -9.088168e-09, 1.3622108e-08, 3.8722618e-08, -1.0000001, 5.066395e-07, 1, -2.0210962e-09, 0, 0.045594554, -7.450581e-09)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.1437406e-10, 7.513576e-09, 0.04559455)
+body_offset = Transform3D(1, -4.5448542e-07, -9.088161e-09, 1.3622108e-08, 3.936205e-08, -1.0000001, 5.066395e-07, 1, -1.3816503e-09, 0, 0.045594554, -7.450581e-09)
 bone_name = "HipL"
 joint_constraints/angular_limit_enabled = true
 joint_constraints/angular_limit_upper = 90.0
@@ -106,10 +106,10 @@ transform = Transform3D(0.9716426, 0.02861385, 0.23471233, -0.016531937, 0.99844
 shape = SubResource("CapsuleShape3D_r8iig")
 
 [node name="Physical Bone HipR" type="PhysicalBone3D" parent="ArmatureBottom/Skeleton3D/PhysicalBoneSimulator3D" index="4" unique_id=121936568]
-transform = Transform3D(-9.443661e-08, -6.391971e-08, 1, -0.089771144, 0.9959625, 5.518394e-08, -0.99596244, -0.08977115, -9.979345e-08, -0.045594547, -0.06909003, 0.029478291)
+transform = Transform3D(-9.4596466e-08, -6.375985e-08, 1, -0.089771144, 0.9959625, 5.5010375e-08, -0.99596244, -0.08977115, -9.993832e-08, -0.045594547, -0.06909003, 0.029478291)
 joint_type = 3
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5558384e-08, 1.3364071e-07, 0.045594554)
-body_offset = Transform3D(1, -7.450581e-09, 6.934626e-08, -2.42094e-09, -7.792138e-09, -1, 0, 1.0000001, 1.0302332e-08, -9.872019e-08, 0.045594554, -1.3411045e-07)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5551094e-08, 1.33648e-07, 0.045594554)
+body_offset = Transform3D(1, -7.450581e-09, 6.950613e-08, -2.261082e-09, -7.9519955e-09, -1, 0, 1.0000001, 1.0142476e-08, -9.872019e-08, 0.045594554, -1.3411045e-07)
 bone_name = "HipR"
 joint_constraints/angular_limit_enabled = true
 joint_constraints/angular_limit_upper = 90.0
