@@ -7,7 +7,7 @@ extends Node3D
 @export var calfMovementStrength = 5.0
 @export var heightToRunMaintenance = 0.85
 @export var uprightMaintenanceStrength = 65.0
-@export var rotationSpeed = 10.0
+@export var rotationSpeed = 17.5
 @export var rotationDamping = 600.0
 @export var bodyDamping = 0.8
 
@@ -21,7 +21,7 @@ extends Node3D
 
 # Force length required to split
 @export var worldForceThreshold = 1500.0
-@export var playerTopForceThreshold = 35.0
+@export var playerTopForceThreshold = 75.0
 @export var playerBottomForceThreshold = 350.0
 
 # Controls values
@@ -186,14 +186,15 @@ func _physics_process(delta: float) -> void:
 	groundedRayResult = space.intersect_ray(query)
 	grounded = groundedRayResult.size() > 0
 	# Series of function calls for handling physics and input
-	_handlePlayerInput(delta)
 	if grounded && !splitPlayers:
+		#rotateTowardTarget is causing jumping to break
 		_rotateTowardTarget(otherPlayer.global_position, delta)
 		_keepUpright()
 		_reduceMovement()
 		_setTopTransform()
 	if splitPlayers:
 		_tryReconnect(delta)
+	_handlePlayerInput(delta)
 	# Update safety timer if need be
 	if safetyTimer > 0.0:
 		safetyTimer -= delta
@@ -484,16 +485,22 @@ func _setTopTransform() -> void:
 func _splitPlayers(split: bool) -> void:
 	# Split >> not split, reconnect
 	if !split:
+		topBoneSim.physical_bones_stop_simulation()
+		bottomBoneSim.physical_bones_stop_simulation()
+		await get_tree().physics_frame
+		# Get all bones, set velocities to 0
 		bottomJoint.angular_velocity = Vector3.ZERO
 		bottomJoint.linear_velocity = Vector3.ZERO
 		topJoint.angular_velocity = Vector3.ZERO
 		topJoint.linear_velocity = Vector3.ZERO
-		await get_tree().physics_frame
 		_setTopTransform()
 		joint.node_a = bottomJoint.get_path()
 		joint.node_b = topJoint.get_path()
 		splitPlayers = false
 		safetyTimer = safetyTimerAfterReconnection
+		await get_tree().physics_frame
+		topBoneSim.physical_bones_start_simulation()
+		bottomBoneSim.physical_bones_start_simulation()
 		return
 	# Not split >> split, disconnect the bodies
 	joint.node_a = NodePath("")
