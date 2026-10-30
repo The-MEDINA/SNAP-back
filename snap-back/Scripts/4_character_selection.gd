@@ -8,9 +8,11 @@ extends Control
 @onready var c1_top_mesh: MeshInstance3D = $MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1/TopMesh
 @onready var c1_bottom_mesh: MeshInstance3D = $MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1/BottomMesh
 
+@onready var p1_controller_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/Top1
 @onready var p1_name_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/TopNameLabel1
 @onready var p1_role_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/TopRoleLabel1
 
+@onready var p2_controller_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/Bottom
 @onready var p2_name_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomNameLabel1
 @onready var p2_role_label: Label = $MainHBoxContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomRoleLabel1
 
@@ -18,9 +20,11 @@ extends Control
 @onready var c2_top_mesh: MeshInstance3D = $MainHBoxContainer2/SubViewportContainer/SubViewport/Node3D/Character2/TopMesh
 @onready var c2_bottom_mesh: MeshInstance3D = $MainHBoxContainer2/SubViewportContainer/SubViewport/Node3D/Character2/BottomMesh
 
+@onready var p3_controller_label: Label = $MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/Top
 @onready var p3_name_label: Label = $MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/TopNameLabel
 @onready var p3_role_label: Label = $MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/TopRoleLabel
 
+@onready var p4_controller_label: Label = $MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/Bottom
 @onready var p4_name_label: Label = $MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomNameLabel
 @onready var p4_role_label: Label = $MainHBoxContainer2/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/BottomRoleLabel
 
@@ -126,8 +130,8 @@ func toggle_ready(player_id: int) -> void:
 		var c2_top = top_options[selected_indices[2]].mesh
 		var c2_bottom = bottom_options[selected_indices[3]].mesh
 		
-		# Match the controller to the player
-
+		# Match the controller to the players
+		PlayerData.change_controllers(device_to_player)
 		
 		# Store in global singletons
 		PlayerData.save_selections(c1_top, c1_bottom, c2_top, c2_bottom)
@@ -178,9 +182,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	):
 		print("device id: ", event.device, " device_to_player: ", device_to_player[event.device])
 	
-	
-	if event.is_action_pressed("LeftTrigger"): cycle_selection(device_to_player[event.device], -1)
-	elif event.is_action_pressed("RightTrigger"): cycle_selection(device_to_player[event.device], 1)
+	if Input.is_action_just_pressed_by_event("LeftTrigger", event): cycle_selection(device_to_player[event.device], -1)
+	elif Input.is_action_just_pressed_by_event("RightTrigger", event): cycle_selection(device_to_player[event.device], 1)
 	elif event.is_action_pressed("Select"): toggle_ready(device_to_player[event.device])
 	
 	# elif event.is_action_released("LeftThumbstickLeft"): swap_players(event.device, "left")
@@ -189,3 +192,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif Input.is_action_just_pressed_by_event("LeftThumbstickUp", event): swap_players(event.device, "up")
 	elif Input.is_action_just_pressed_by_event("LeftThumbstickDown", event): swap_players(event.device, "down")
 	# elif event.is_action_pressed("LeftThumbstickDown"): swap_players(event.device, "down")
+	
+	# update labels
+	p1_controller_label.text = "Top (Device " + str(device_to_player.find(0)) + ")"
+	p2_controller_label.text = "Bottom (Device " + str(device_to_player.find(1)) + ")"
+	p3_controller_label.text = "Top (Device " + str(device_to_player.find(2)) + ")"
+	p4_controller_label.text = "Bottom (Device " + str(device_to_player.find(3)) + ")"
