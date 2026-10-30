@@ -38,8 +38,7 @@ var lastPhysicsState = false
 
 # Initial value setup
 func _ready() -> void:
-	currentState = GameState.GAME_WAITING
-	debugLabel.text = 'Controls\n3 >> Start game\n4 >> Pause game'
+	currentState = GameState.GAME_COUNTDOWN
 	PhysicsServer3D.set_active(false)
 	return
 
