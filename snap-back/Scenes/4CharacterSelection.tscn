@@ -166,7 +166,6 @@ script = ExtResource("7_54b3v")
 [node name="TopMesh" type="MeshInstance3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1" unique_id=1984217696]
 
 [node name="BottomMesh" type="MeshInstance3D" parent="MainHBoxContainer/SubViewportContainer/SubViewport/Node3D/Character1" unique_id=756435030]
-visible = false
 
 [node name="MainHBoxContainer2" type="HBoxContainer" parent="." unique_id=339947473]
 layout_mode = 1
