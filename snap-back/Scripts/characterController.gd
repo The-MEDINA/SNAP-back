@@ -2,6 +2,10 @@
 
 extends Node3D
 
+# Models
+@export var topModel = "res://Character/mech_top.tscn"
+@export var bottomModel = "res://Character/bottom_1.tscn"
+
 # Physics values
 @export var upperArmMovementStrength = 1.5
 @export var calfMovementStrength = 5.0
@@ -123,6 +127,16 @@ var groundedRayResult
 func _ready() -> void:
 	# Assign variables
 	joint = $Joint
+	
+	# debug
+	
+	var Top = load(topModel).instantiate()
+	add_child(Top)
+	var Bottom = load(bottomModel).instantiate()
+	add_child(Bottom)
+	
+	# debug
+	
 	topBoneSim = $Top/ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D
 	bottomBoneSim = $Bottom/ArmatureBottom/Skeleton3D/PhysicalBoneSimulator3D
 	# Start bone simulation

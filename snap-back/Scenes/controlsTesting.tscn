@@ -3,8 +3,6 @@
 [ext_resource type="Script" uid="uid://bkj4gqnxp8h6h" path="res://Scripts/gameStateMachine.gd" id="1_m2lay"]
 [ext_resource type="Script" uid="uid://cgsidc77wnwmg" path="res://Scripts/cameraController.gd" id="1_n7tqr"]
 [ext_resource type="Script" uid="uid://cfu1b0fs0y1b4" path="res://Scripts/characterController.gd" id="3_gg4yg"]
-[ext_resource type="PackedScene" uid="uid://b4rd8a8jyeqrj" path="res://Character/bottom_1.tscn" id="4_gg4yg"]
-[ext_resource type="PackedScene" uid="uid://bh6a3dx6tk8on" path="res://Character/top.tscn" id="5_6tqc2"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_32bnj"]
 
@@ -24,8 +22,8 @@ physics_interpolation_mode = 2
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35800695, 0.996895)
 fov = 50.0
 script = ExtResource("1_n7tqr")
-object1 = NodePath("../Character/Top")
-object2 = NodePath("../Character2/Top")
+object1 = NodePath("../Character")
+object2 = NodePath("../Character2")
 cameraBounds = NodePath("../CameraBounds")
 
 [node name="DebugLabel" type="Label" parent="Camera3D" unique_id=109217037]
@@ -116,12 +114,6 @@ leftArmPose = Vector2(1, 0)
 rightArmPose = Vector2(0, 1)
 otherPlayer = NodePath("../Character2")
 
-[node name="Bottom" parent="Character" unique_id=623702786 instance=ExtResource("4_gg4yg")]
-script = null
-
-[node name="Top" parent="Character" unique_id=1504632149 instance=ExtResource("5_6tqc2")]
-script = null
-
 [node name="Joint" type="Generic6DOFJoint3D" parent="Character" unique_id=829068928]
 linear_limit_x/softness = 16.0
 linear_limit_y/softness = 16.0
@@ -141,10 +133,6 @@ topController = 1
 bottomController = 1
 singlePlayer = false
 otherPlayer = NodePath("../Character")
-
-[node name="Bottom" parent="Character2" unique_id=190974490 instance=ExtResource("4_gg4yg")]
-
-[node name="Top" parent="Character2" unique_id=28256667 instance=ExtResource("5_6tqc2")]
 
 [node name="Joint" type="Generic6DOFJoint3D" parent="Character2" unique_id=1213715451]
 linear_limit_x/softness = 16.0
