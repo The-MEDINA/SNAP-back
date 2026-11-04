@@ -488,6 +488,7 @@ func _setTopTransform() -> void:
 # Depending on splitPlayers, either split the bodies or reconnect them
 func _splitPlayers(split: bool) -> void:
 	# Split >> not split, reconnect
+	camera._startCameraShake(0.2, 0.15)
 	if !split:
 		topBoneSim.physical_bones_stop_simulation()
 		bottomBoneSim.physical_bones_stop_simulation()
