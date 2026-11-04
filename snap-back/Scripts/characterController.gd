@@ -12,7 +12,7 @@ extends Node3D
 @export var bodyDamping = 0.8
 
 # Movement values
-@export var upwardCalfMovementMultiplier = 1.5
+@export var upwardCalfMovementMultiplier = 1.25
 @export var upwardCalfSplitMovementMultiplier = 0.5
 @export var calfMovementMultiplier = 250.0
 @export var calfSplitMovementMultiplier = 30.0
@@ -191,11 +191,11 @@ func _physics_process(delta: float) -> void:
 		grounded = groundedRayResult.size() > 0
 		# Series of function calls for handling physics and input
 		if grounded && !splitPlayers:
-			#rotateTowardTarget is causing jumping to break
 			_rotateTowardTarget(otherPlayer.global_position, delta)
-			_keepUpright()
-			_reduceMovement()
 			_setTopTransform()
+		if !splitPlayers:
+			_reduceMovement()
+			_keepUpright()
 		if splitPlayers:
 			_tryReconnect(delta)
 		_handlePlayerInput(delta)
@@ -225,15 +225,28 @@ func _keepUpright() -> void:
 	# Rotate torso, apply oppsoite rotation to pelvis to avoid spinning forever
 	topJoint.angular_velocity += correction
 	bottomJoint.angular_velocity -= correction
-	# If angle is close enough to being upright, keep character standing up
-	if angle < 5.0:
+	# If angle is close enough to being upright and on the ground, keep character standing up
+	if angle < 5.0 && grounded:
 		if groundedRayResult.position.y + 0.75 > bottomJoint.global_position.y:
 			topJoint.linear_velocity += Vector3.UP * abs(groundedRayResult.position.y - bottomJoint.global_position.y) * 0.5
 
-# Reduce movement to make player slide less
+# Reduce core movement to make player slide less if grounded, or reduce limb movement if in the air to stop flying
 func _reduceMovement() -> void:
-	topJoint.linear_velocity *= bodyDamping
-	bottomJoint.linear_velocity *= bodyDamping
+	if grounded:
+		topJoint.linear_velocity *= bodyDamping
+		bottomJoint.linear_velocity *= bodyDamping
+	#else:
+		#rightCalf.linear_velocity *= bodyDamping
+		#leftCalf.linear_velocity *= bodyDamping
+		#rightUpperArm.linear_velocity *= bodyDamping
+		#leftUpperArm.linear_velocity *= bodyDamping
+	
+# Reduce limb movement to avoid flying away
+func _reduceAirMovement() -> void:
+	rightCalf.linear_velocity *= bodyDamping
+	leftCalf.linear_velocity *= bodyDamping
+	rightUpperArm.linear_velocity *= bodyDamping
+	leftUpperArm.linear_velocity *= bodyDamping
 
 # Rotate parent toward the target Vector3
 # THIS IS CAUSING THE CHARACTER TO FLY WHEN MID-AIR
