@@ -12,7 +12,7 @@ enum GameState {
 @export var player1: Node3D
 @export var player2: Node3D
 @export var debugLabel: Label
-var currentState: GameState
+@export var currentState: GameState
 var resumeState: GameState
 var player1Down: bool
 var player2Down: bool
@@ -63,14 +63,8 @@ func _process(delta: float) -> void:
 # Logic to be called every single frame, despite game state
 # Used for button input (for debugging) and handling pausing
 func _globalLoop() -> void:
-	# Inputs for debugging
-	if Input.is_action_just_pressed("DebugPlayer1Down"):
-		player1Down = !player1Down
-	if Input.is_action_just_pressed("DebugPlayer2Down"):
-		player2Down = !player2Down
-	if Input.is_action_just_pressed("DebugStart"):
-		startGame = !startGame
-	if Input.is_action_just_pressed("DebugPause"):
+	# Allow pausing with a controller
+	if Input.is_action_just_pressed("Select"):
 		paused = !paused
 	# Logic to always run
 	player1Down = player1.splitPlayers

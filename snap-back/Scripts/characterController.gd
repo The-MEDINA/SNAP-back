@@ -118,10 +118,12 @@ var camera: Camera3D
 # Misc
 var grounded: bool
 var groundedRayResult
+var gameStateMachine: Node
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Assign variables
+	gameStateMachine = get_parent()
 	joint = $Joint
 	topBoneSim = $Top/ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D
 	bottomBoneSim = $Bottom/ArmatureBottom/Skeleton3D/PhysicalBoneSimulator3D
@@ -178,31 +180,33 @@ func _ready() -> void:
 
 # Runs on physics tick
 func _physics_process(delta: float) -> void:
-	# Check to see if body should be upright (only if body is close to ground), Character and Joint never actually move
-	var query = PhysicsRayQueryParameters3D.create(bottomJoint.global_position, bottomJoint.global_position + Vector3.DOWN * heightToRunMaintenance)
-	# Hit only layer 4 (4th bit position for 4th layer, 1000 in binary == 8 in decimal)
-	query.collision_mask = 8
-	var space = get_world_3d().direct_space_state
-	groundedRayResult = space.intersect_ray(query)
-	grounded = groundedRayResult.size() > 0
-	# Series of function calls for handling physics and input
-	if grounded && !splitPlayers:
-		#rotateTowardTarget is causing jumping to break
-		_rotateTowardTarget(otherPlayer.global_position, delta)
-		_keepUpright()
-		_reduceMovement()
-		_setTopTransform()
-	if splitPlayers:
-		_tryReconnect(delta)
-	_handlePlayerInput(delta)
-	# Update safety timer if need be
-	if safetyTimer > 0.0:
-		safetyTimer -= delta
-		if safetyTimer < 0.0:
-			safetyTimer = 0.0
-	# Update parent
-	if !splitPlayers || (splitPlayers && otherPlayer.splitPlayers):
-		global_position = (bottomJoint.global_position + topJoint.global_position) / 2.0
+	# Don't run if paused
+	if gameStateMachine.currentState > 1 && gameStateMachine.currentState < 4:
+		# Check to see if body should be upright (only if body is close to ground), Character and Joint never actually move
+		var query = PhysicsRayQueryParameters3D.create(bottomJoint.global_position, bottomJoint.global_position + Vector3.DOWN * heightToRunMaintenance)
+		# Hit only layer 4 (4th bit position for 4th layer, 1000 in binary == 8 in decimal)
+		query.collision_mask = 8
+		var space = get_world_3d().direct_space_state
+		groundedRayResult = space.intersect_ray(query)
+		grounded = groundedRayResult.size() > 0
+		# Series of function calls for handling physics and input
+		if grounded && !splitPlayers:
+			#rotateTowardTarget is causing jumping to break
+			_rotateTowardTarget(otherPlayer.global_position, delta)
+			_keepUpright()
+			_reduceMovement()
+			_setTopTransform()
+		if splitPlayers:
+			_tryReconnect(delta)
+		_handlePlayerInput(delta)
+		# Update safety timer if need be
+		if safetyTimer > 0.0:
+			safetyTimer -= delta
+			if safetyTimer < 0.0:
+				safetyTimer = 0.0
+		# Update parent
+		if !splitPlayers || (splitPlayers && otherPlayer.splitPlayers):
+			global_position = (bottomJoint.global_position + topJoint.global_position) / 2.0
 
 # Keep the body upright
 func _keepUpright() -> void:
