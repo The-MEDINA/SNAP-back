@@ -2,6 +2,10 @@
 
 extends Node3D
 
+# Models
+@export var topModel = "res://Character/mech_top.tscn"
+@export var bottomModel = "res://Character/mech_bottom.tscn"
+
 # Physics values
 @export var upperArmMovementStrength = 1.5
 @export var calfMovementStrength = 5.0
@@ -125,6 +129,24 @@ func _ready() -> void:
 	# Assign variables
 	gameStateMachine = get_parent()
 	joint = $Joint
+	
+	# Grab the correct player models in multiplayer
+	if !singlePlayer:
+		# char1
+		if (topController == 0):
+			topModel = PlayerData.character_selections["char1"]["top_mesh"]
+			bottomModel = PlayerData.character_selections["char1"]["bottom_mesh"]
+		# char2
+		else:
+			topModel = PlayerData.character_selections["char2"]["top_mesh"]
+			bottomModel = PlayerData.character_selections["char2"]["bottom_mesh"]
+	
+	var Top = load(topModel).instantiate()
+	add_child(Top)
+	var Bottom = load(bottomModel).instantiate()
+	add_child(Bottom)
+	
+	
 	topBoneSim = $Top/ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D
 	bottomBoneSim = $Bottom/ArmatureBottom/Skeleton3D/PhysicalBoneSimulator3D
 	# Start bone simulation
