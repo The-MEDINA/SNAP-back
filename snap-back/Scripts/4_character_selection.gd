@@ -135,6 +135,8 @@ func toggle_ready(player_id: int) -> void:
 		# Store in global singletons
 		PlayerData.save_selections(c1_top, c1_bottom, c2_top, c2_bottom)
 		
+		PlayerData.mesh_index_to_tscn_path(selected_indices[0], selected_indices[1], selected_indices[2], selected_indices[3])
+		
 		# Change to gameplay scene
 		get_tree().change_scene_to_file("res://Scenes/controlsTesting.tscn")
 
