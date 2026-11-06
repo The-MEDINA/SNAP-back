@@ -14,9 +14,10 @@ extends Node3D
 @export var rotationSpeed = 17.5
 @export var rotationDamping = 600.0
 @export var bodyDamping = 0.8
+@export var airDamping = 0.85
 
 # Movement values
-@export var upwardCalfMovementMultiplier = 1.25
+@export var upwardCalfMovementMultiplier = 1.0
 @export var upwardCalfSplitMovementMultiplier = 0.5
 @export var calfMovementMultiplier = 250.0
 @export var calfSplitMovementMultiplier = 30.0
@@ -257,11 +258,11 @@ func _reduceMovement() -> void:
 	if grounded:
 		topJoint.linear_velocity *= bodyDamping
 		bottomJoint.linear_velocity *= bodyDamping
-	#else:
-		#rightCalf.linear_velocity *= bodyDamping
-		#leftCalf.linear_velocity *= bodyDamping
-		#rightUpperArm.linear_velocity *= bodyDamping
-		#leftUpperArm.linear_velocity *= bodyDamping
+	else:
+		rightCalf.linear_velocity *= airDamping
+		leftCalf.linear_velocity *= airDamping
+		rightUpperArm.linear_velocity *= airDamping
+		leftUpperArm.linear_velocity *= airDamping
 	
 # Reduce limb movement to avoid flying away
 func _reduceAirMovement() -> void:
