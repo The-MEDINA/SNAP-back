@@ -159,6 +159,10 @@ func _ready() -> void:
 	# Connect bodies
 	joint.node_a = bottomJoint.get_path()
 	joint.node_b = topJoint.get_path()
+	# Set parameters to joint
+	joint.set_param_x(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.01)
+	joint.set_param_y(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.01)
+	joint.set_param_z(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.01)
 	# Assign variables
 	rightCalf = bottomBoneSim.get_node('Physical Bone CalfR') as PhysicalBone3D
 	leftCalf = bottomBoneSim.get_node('Physical Bone CalfL') as PhysicalBone3D
