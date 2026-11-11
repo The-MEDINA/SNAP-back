@@ -3,8 +3,8 @@
 extends Node3D
 
 # Models
-@export var topModel = "res://Character/mech_top.tscn"
-@export var bottomModel = "res://Character/mech_bottom.tscn"
+@export var topModel = "res://Character/top.tscn"
+@export var bottomModel = "res://Character/bottom_1.tscn"
 
 # Physics values
 @export var upperArmMovementStrength = 1.5
