@@ -22,7 +22,7 @@ extends Node3D
 @export var calfMovementMultiplier = 250.0
 @export var calfSplitMovementMultiplier = 30.0
 @export var upperArmSplitMovementMultiplier = 10.0
-@export var distanceForMaxSplitDiagonalMovement = 3.0
+@export var distanceForMaxSplitDiagonalMovement = 2.0
 
 # Force length required to split
 @export var worldForceThreshold = 1500.0
@@ -79,7 +79,7 @@ var bumperPrevious: bool
 @export var splitPlayers = false
 
 # Reconnection values
-@export var reconnectionDistance = 1.0
+@export var reconnectionDistance = 2.0
 @export var reconnectionTimerMax = 1.0
 var reconnectionTimer = reconnectionTimerMax
 @export var safetyTimerAfterReconnection = 1.0
@@ -159,10 +159,16 @@ func _ready() -> void:
 	# Connect bodies
 	joint.node_a = bottomJoint.get_path()
 	joint.node_b = topJoint.get_path()
-	# Set parameters to joint
-	joint.set_param_x(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.01)
-	joint.set_param_y(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.01)
-	joint.set_param_z(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.01)
+	# Set joint params
+	joint.set_param_x(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.0)
+	joint.set_param_y(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.0)
+	joint.set_param_z(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.0)
+	joint.set_param_x(Generic6DOFJoint3D.PARAM_ANGULAR_FORCE_LIMIT, 0.0)
+	joint.set_param_y(Generic6DOFJoint3D.PARAM_ANGULAR_FORCE_LIMIT, 0.0)
+	joint.set_param_z(Generic6DOFJoint3D.PARAM_ANGULAR_FORCE_LIMIT, 0.0)
+	joint.set_param_x(Generic6DOFJoint3D.PARAM_LINEAR_SPRING_STIFFNESS, 0.0)
+	joint.set_param_y(Generic6DOFJoint3D.PARAM_LINEAR_SPRING_STIFFNESS, 0.0)
+	joint.set_param_z(Generic6DOFJoint3D.PARAM_LINEAR_SPRING_STIFFNESS, 0.0)
 	# Assign variables
 	rightCalf = bottomBoneSim.get_node('Physical Bone CalfR') as PhysicalBone3D
 	leftCalf = bottomBoneSim.get_node('Physical Bone CalfL') as PhysicalBone3D
@@ -253,7 +259,7 @@ func _keepUpright() -> void:
 	topJoint.angular_velocity += correction
 	bottomJoint.angular_velocity -= correction
 	# If angle is close enough to being upright and on the ground, keep character standing up
-	if angle < 5.0 && grounded:
+	if angle < 3.0 && grounded:
 		if groundedRayResult.position.y + 0.75 > bottomJoint.global_position.y:
 			topJoint.linear_velocity += Vector3.UP * abs(groundedRayResult.position.y - bottomJoint.global_position.y) * 0.5
 
@@ -538,6 +544,10 @@ func _splitPlayers(split: bool) -> void:
 		bottomJoint.linear_velocity = Vector3.ZERO
 		topJoint.angular_velocity = Vector3.ZERO
 		topJoint.linear_velocity = Vector3.ZERO
+		rightCalf.linear_velocity = Vector3.ZERO
+		leftCalf.linear_velocity = Vector3.ZERO
+		rightUpperArm.linear_velocity = Vector3.ZERO
+		leftUpperArm.linear_velocity = Vector3.ZERO
 		_setTopTransform()
 		joint.node_a = bottomJoint.get_path()
 		joint.node_b = topJoint.get_path()
