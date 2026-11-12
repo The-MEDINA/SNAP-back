@@ -3,8 +3,10 @@
 [ext_resource type="Script" uid="uid://bkj4gqnxp8h6h" path="res://Scripts/gameStateMachine.gd" id="1_m2lay"]
 [ext_resource type="Script" uid="uid://cgsidc77wnwmg" path="res://Scripts/cameraController.gd" id="1_n7tqr"]
 [ext_resource type="Script" uid="uid://cfu1b0fs0y1b4" path="res://Scripts/characterController.gd" id="3_gg4yg"]
+[ext_resource type="PackedScene" uid="uid://cekcwuxfvvp1v" path="res://Stage/textured_office.tscn" id="4_m2lay"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_32bnj"]
+size = Vector3(0.19684601, 1, 0.29382324)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_5ti0k"]
 size = Vector3(7.779541, 1, 4.5273438)
@@ -19,8 +21,9 @@ debugLabel = NodePath("Camera3D/DebugLabel")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1019244076 node_paths=PackedStringArray("object1", "object2", "cameraBounds")]
 physics_interpolation_mode = 2
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35800695, 0.996895)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35800695, 0.9968951)
 fov = 50.0
+near = 0.15
 script = ExtResource("1_n7tqr")
 object1 = NodePath("../Character")
 object2 = NodePath("../Character2")
@@ -35,29 +38,35 @@ theme_override_font_sizes/font_size = 32
 horizontal_alignment = 1
 
 [node name="CameraBounds" type="MeshInstance3D" parent="." unique_id=635781397]
-transform = Transform3D(54.100666, 0, 0, 0, 10.345334, 0, 0, 0, 29.819696, 0, 0, 0)
+transform = Transform3D(54.100666, 0, 0, 0, 10.345334, 0, 0, 0, 29.819696, -0.23953146, -0.825974, 0.93732584)
+visible = false
 layers = 0
 mesh = SubResource("BoxMesh_32bnj")
 
 [node name="RimLight" type="AreaLight3D" parent="." unique_id=58461841]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.131692)
+visible = false
 light_energy = 2.0
 light_cull_mask = 4294967293
 
 [node name="FillLight" type="AreaLight3D" parent="." unique_id=1179843079]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.9417353)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7.8425694)
 light_energy = 0.465
 shadow_enabled = true
 shadow_blur = 3.0
+area_range = 4096.0
+area_attenuation = 0.0
 
 [node name="KeyLight" type="AreaLight3D" parent="." unique_id=1916879357]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.4333236)
+visible = false
 light_energy = 5.139
 shadow_enabled = true
 shadow_blur = 0.5
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=942030583]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.619222, 0)
+visible = false
 collision_layer = 15
 collision_mask = 7
 
@@ -112,7 +121,6 @@ leftLegPose = Vector2(1, 0)
 rightLegPose = Vector2(0, 1)
 leftArmPose = Vector2(1, 0)
 rightArmPose = Vector2(0, 1)
-singlePlayer = false
 otherPlayer = NodePath("../Character2")
 
 [node name="Joint" type="Generic6DOFJoint3D" parent="Character" unique_id=829068928]
@@ -132,7 +140,6 @@ leftArmPose = Vector2(1, 0)
 rightArmPose = Vector2(0, 1)
 topController = 1
 bottomController = 1
-singlePlayer = false
 otherPlayer = NodePath("../Character")
 
 [node name="Joint" type="Generic6DOFJoint3D" parent="Character2" unique_id=1213715451]
@@ -142,3 +149,6 @@ linear_limit_z/softness = 16.0
 angular_limit_x/softness = 16.0
 angular_limit_y/softness = 16.0
 angular_limit_z/softness = 16.0
+
+[node name="textured-office" parent="." unique_id=1047602021 instance=ExtResource("4_m2lay")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3755474, -1.6844199, 0.44607472)
