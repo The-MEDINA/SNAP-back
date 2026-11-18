@@ -25,6 +25,10 @@ GameManager="*uid://bvth3g67kvjr3"
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[filesystem]
+
+import/blender/enabled=false
+
 [input]
 
 LeftThumbstickLeft={

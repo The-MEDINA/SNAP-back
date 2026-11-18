@@ -8,12 +8,16 @@ var character_selections = {
 	"char1": {
 		"top_mesh": null,
 		"bottom_mesh": null,
+		"top_pose": null, #arm charge behvior
+		#"bottom_pose" : null
 		"top_player_id": 0,    # P1
 		"bottom_player_id": 1  # P2
 	},
 	"char2": {
 		"top_mesh": null,
 		"bottom_mesh": null,
+		"top_pose": null, #arm charge behvior
+		#"bottom_pose" : null
 		"top_player_id": 2,    # P3
 		"bottom_player_id": 3  # P4
 	}
@@ -68,12 +72,20 @@ func mesh_index_to_tscn_path(p1_selection: int, p2_selection: int, p3_selection:
 
 func set_top(char, mesh, index):
 	match index:
-		# Mech
+		# Mech -> Pulls back and punches stright forward
 		0:
 			character_selections[char][mesh] = "res://Character/mech_top.tscn"
+			character_selections[char]["top_psose"] = {
+				"windup": Vector2(-1.0, 0.0),
+				"release": Vector2(1.0, 0.0)
+			}
 		# Debug model
 		_:
 			character_selections[char][mesh] = "res://Character/top.tscn"
+			character_selections[char]["top_pose"] = {
+				"windup": Vector2(-0.3, -0.8),
+				"release": Vector2(0.1, 1.0)
+			}
 	pass
 	
 func set_bottom(char, mesh, index):
