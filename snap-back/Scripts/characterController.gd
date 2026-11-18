@@ -594,6 +594,8 @@ func _splitPlayers(split: bool) -> void:
 	if !split:
 		topBoneSim.physical_bones_stop_simulation()
 		bottomBoneSim.physical_bones_stop_simulation()
+		($Top/ArmatureTop/Skeleton3D).reset_bone_poses()
+		($Bottom/ArmatureBottom/Skeleton3D).reset_bone_poses()
 		await get_tree().physics_frame
 		# Get all bones, set velocities to 0
 		bottomJoint.angular_velocity = Vector3.ZERO
