@@ -16,6 +16,32 @@ extends Node3D
 @export var bodyDamping = 0.8
 @export var airDamping = 0.85
 
+# Character specifici arm charge
+# "windup": direction arm pulls while holding button
+# "release": direction arm snaps when button is released
+const CHARACTER_ARM_POSES = {
+	"Mecha": {
+		"windup": Vector2(-1.0, 0.0),  # Pulls arm straight back
+		"release": Vector2(1.0, 0.0)   # Punches straight forward
+	},
+	"Scarecrow": {
+		"windup": Vector2(-0.3, -0.8), # Pulls arm slightly back and down
+		"release": Vector2(0.1, 1.0)   # Shoots hand straight up
+	}
+}
+
+#For now default the character pose to Mecha (punch)
+var activeArmPose = CHARACTER_ARM_POSES["Mecha"]
+
+#Time value for arms 
+@export var maxPunchChargeTime = 1.0 #how many seconds for it to reach 100% punch power
+@export var punchExtendDuration = 0.25 #how long the arm stays extended after release
+@export var maxPunchForceMultiplier = 2.5 #how much stronger a full charge punch is 
+
+var armChargeTimers = [0.0, 0.0]
+var armReleaseTimers = [0.0, 0.0]
+var armPunchStrengths = [0.0, 0.0]
+
 # Movement values
 @export var upwardCalfMovementMultiplier = 1.0
 @export var upwardCalfSplitMovementMultiplier = 0.5
@@ -133,15 +159,26 @@ func _ready() -> void:
 	
 	# Grab the correct player models in multiplayer
 	if !singlePlayer:
-		# char1
-		if (topController == 0):
-			topModel = PlayerData.character_selections["char1"]["top_mesh"]
-			bottomModel = PlayerData.character_selections["char1"]["bottom_mesh"]
-		# char2
+		var charKey = "char1" if (topController == 0) else "char2"
+		topModel = PlayerData.character_selections[charKey]["top_mesh"]
+		bottomModel = PlayerData.character_selections[charKey]["bottom_mesh"]
+		
+		if PlayerData.character_selections[charKey]["top_pose"] != null:
+			activeArmPose = PlayerData.character_selections[charKey]["top_pose"]
+		## char1
+		#if (topController == 0):
+			#topModel = PlayerData.character_selections["char1"]["top_mesh"]
+			#bottomModel = PlayerData.character_selections["char1"]["bottom_mesh"]
+		## char2
+		#else:
+			#topModel = PlayerData.character_selections["char2"]["top_mesh"]
+			#bottomModel = PlayerData.character_selections["char2"]["bottom_mesh"]
+	#
+	else:
+		if topModel == "res://Character/mech_top.tscn":
+			activeArmPose = CHARACTER_ARM_POSES["Mecha"]
 		else:
-			topModel = PlayerData.character_selections["char2"]["top_mesh"]
-			bottomModel = PlayerData.character_selections["char2"]["bottom_mesh"]
-	
+			activeArmPose = CHARACTER_ARM_POSES["Scarecrow"]
 	var Top = load(topModel).instantiate()
 	add_child(Top)
 	var Bottom = load(bottomModel).instantiate()
@@ -313,15 +350,16 @@ func _handlePlayerInput(delta: float) -> void:
 	var topX = Input.is_joy_button_pressed(topController, JOY_BUTTON_X)
 	var topY = Input.is_joy_button_pressed(topController, JOY_BUTTON_Y)
 	# Run punch button function regardless of input to keep timers running
-	var punchInput =  _armButtonHeld(topB, HeldButtonID.TopB, delta) - _armButtonHeld(topX, HeldButtonID.TopX, delta)
+	var rightArmAction = _armButtonHeld(topB, HeldButtonID.TopB, delta)
+	var leftArmAction = _armButtonHeld(topX, HeldButtonID.TopX, delta)
 	var legInput = Vector2(_legButtonHeld(bottomB, HeldButtonID.BottomB, delta) - _legButtonHeld(bottomX, HeldButtonID.BottomX, delta), (1.0 if bottomY else 0.0))
 	# Read thumbstick inputs, use buttons if they're being pressed
 	var topRightThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
-	if punchInput != 0.0:
-		topRightThumbstick.x = punchInput
+	if rightArmAction != Vector2.ZERO:
+		topRightThumbstick = rightArmAction
 	var topLeftThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
-	if punchInput != 0.0:
-		topLeftThumbstick.x = punchInput
+	if leftArmAction != Vector2.ZERO:
+		topLeftThumbstick = leftArmAction
 	var bottomRightThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_Y))
 		if !((bottomB || bottomX) && !alternateLegs) && !bottomY else legInput)
 	var bottomLeftThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_Y))
@@ -468,19 +506,37 @@ func _legButtonHeld(heldButton: bool, id: HeldButtonID, delta: float) -> float:
 		return 0.0
 
 # Handle holding down an arm button, outputting -1, and, upon release, outputting 1 for a bit
-func _armButtonHeld(heldButton: bool, id: HeldButtonID, delta: float) -> float:
+func _armButtonHeld(heldButton: bool, id: HeldButtonID, delta: float) -> Vector2:
 	# Get index based on arm, only supports these 2 (can come up with more refined approach later)
-	var index = (0 if id == 5 else (1 if id == 6 else -1))
+	#var index = (0 if id == 5 else (1 if id == 6 else -1))
+	var index = (0 if id == HeldButtonID.TopB else (1 if id == HeldButtonID.TopX else -1))
 	# If button held
 	if heldButton:
-		armStates[index] = clampf(armStates[index] + delta * armHeldTimeMultiplier, minArmReleaseTime, maxArmReleaseTime)
-		return -1.0
+		armReleaseTimers[index] = 0.0
+		armChargeTimers[index] = clampf(armChargeTimers[index] + delta, 0.0, maxPunchChargeTime)
+		var chargeRatio = armChargeTimers[index] / maxPunchChargeTime
+		return activeArmPose["windup"] * lerpf(0.25, 1.0, chargeRatio)
+		
+	elif armChargeTimers[index] > 0.0:
+		# Button released
+		var chargeRatio = armChargeTimers[index] / maxPunchChargeTime
+		armPunchStrengths[index] = lerpf(1.0, maxPunchForceMultiplier, chargeRatio)
+		armReleaseTimers[index] = punchExtendDuration
+		armChargeTimers[index] = 0.0
+		
+	if armReleaseTimers[index] > 0.0:
+		armReleaseTimers[index] -= delta
+		return activeArmPose["release"] * armPunchStrengths[index]
+		
+	return Vector2.ZERO
+		#armStates[index] = clampf(armStates[index] + delta * armHeldTimeMultiplier, minArmReleaseTime, maxArmReleaseTime)
+		#return -1.0
 	# If button released and timer must run
-	if !heldButton && armStates[index] > minArmReleaseTime:
-		armStates[index] = clampf(armStates[index] - delta, minArmReleaseTime, maxArmReleaseTime)
-		return 1.0
-	# Nothing is happening
-	return 0.0
+	#if !heldButton && armStates[index] > minArmReleaseTime:
+		#armStates[index] = clampf(armStates[index] - delta, minArmReleaseTime, maxArmReleaseTime)
+		#return 1.0
+	## Nothing is happening
+	#return 0.0
 
 # Alternate face button variable based on button ID
 func _alternateFaceButtonVariable(id: HeldButtonID):
