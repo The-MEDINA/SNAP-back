@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bkj4gqnxp8h6h" path="res://Scripts/gameStateMachine.gd" id="1_m2lay"]
 [ext_resource type="Script" uid="uid://cgsidc77wnwmg" path="res://Scripts/cameraController.gd" id="1_n7tqr"]
 [ext_resource type="Script" uid="uid://cfu1b0fs0y1b4" path="res://Scripts/characterController.gd" id="3_gg4yg"]
-[ext_resource type="PackedScene" uid="uid://cekcwuxfvvp1v" path="res://Stage/textured_office.tscn" id="4_m2lay"]
+[ext_resource type="PackedScene" uid="uid://4e2fvp2omqe1" path="res://Stage/textured_office.scn" id="4_m2lay"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_32bnj"]
 size = Vector3(0.19684601, 1, 0.29382324)
@@ -152,5 +152,5 @@ angular_limit_x/softness = 16.0
 angular_limit_y/softness = 16.0
 angular_limit_z/softness = 16.0
 
-[node name="textured-office" parent="." unique_id=1047602021 instance=ExtResource("4_m2lay")]
+[node name="textured-office2" parent="." unique_id=1047602021 instance=ExtResource("4_m2lay")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3755474, -1.6844199, 0.44607472)
