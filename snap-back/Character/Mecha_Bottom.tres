@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PartOption" format=3 uid="uid://ds4vss5qa4bxr"]
+
+[ext_resource type="ArrayMesh" uid="uid://5f0qp43rrhyn" path="res://Assets/Models/RobotBottom.res" id="1_3gg2u"]
+[ext_resource type="Script" uid="uid://11cu0aac0dfw" path="res://Scripts/PartOption.gd" id="1_d7443"]
+
+[resource]
+script = ExtResource("1_d7443")
+name = "Mecha"
+role = "Speed"
+mesh = ExtResource("1_3gg2u")
+metadata/_custom_type_script = "uid://11cu0aac0dfw"

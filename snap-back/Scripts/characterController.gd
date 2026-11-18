@@ -2,26 +2,57 @@
 
 extends Node3D
 
+# Models
+@export var topModel = "res://Character/top.tscn"
+@export var bottomModel = "res://Character/bottom_1.tscn"
+
 # Physics values
 @export var upperArmMovementStrength = 1.5
 @export var calfMovementStrength = 5.0
 @export var heightToRunMaintenance = 0.85
 @export var uprightMaintenanceStrength = 65.0
-@export var rotationSpeed = 10.0
+@export var rotationSpeed = 17.5
 @export var rotationDamping = 600.0
 @export var bodyDamping = 0.8
+@export var airDamping = 0.85
+
+# Character specifici arm charge
+# "windup": direction arm pulls while holding button
+# "release": direction arm snaps when button is released
+const CHARACTER_ARM_POSES = {
+	"Mecha": {
+		"windup": Vector2(-1.0, 0.0),  # Pulls arm straight back
+		"release": Vector2(1.0, 0.0)   # Punches straight forward
+	},
+	"Scarecrow": {
+		"windup": Vector2(-0.3, -0.8), # Pulls arm slightly back and down
+		"release": Vector2(0.1, 1.0)   # Shoots hand straight up
+	}
+}
+
+#For now default the character pose to Mecha (punch)
+var activeArmPose = CHARACTER_ARM_POSES["Mecha"]
+
+#Time value for arms 
+@export var maxPunchChargeTime = 1.0 #how many seconds for it to reach 100% punch power
+@export var punchExtendDuration = 0.25 #how long the arm stays extended after release
+@export var maxPunchForceMultiplier = 2.5 #how much stronger a full charge punch is 
+
+var armChargeTimers = [0.0, 0.0]
+var armReleaseTimers = [0.0, 0.0]
+var armPunchStrengths = [0.0, 0.0]
 
 # Movement values
-@export var upwardCalfMovementMultiplier = 1.5
+@export var upwardCalfMovementMultiplier = 1.0
 @export var upwardCalfSplitMovementMultiplier = 0.5
 @export var calfMovementMultiplier = 250.0
 @export var calfSplitMovementMultiplier = 30.0
 @export var upperArmSplitMovementMultiplier = 10.0
-@export var distanceForMaxSplitDiagonalMovement = 3.0
+@export var distanceForMaxSplitDiagonalMovement = 2.0
 
 # Force length required to split
 @export var worldForceThreshold = 1500.0
-@export var playerTopForceThreshold = 35.0
+@export var playerTopForceThreshold = 75.0
 @export var playerBottomForceThreshold = 350.0
 
 # Controls values
@@ -74,7 +105,7 @@ var bumperPrevious: bool
 @export var splitPlayers = false
 
 # Reconnection values
-@export var reconnectionDistance = 1.0
+@export var reconnectionDistance = 2.0
 @export var reconnectionTimerMax = 1.0
 var reconnectionTimer = reconnectionTimerMax
 @export var safetyTimerAfterReconnection = 1.0
@@ -118,11 +149,42 @@ var camera: Camera3D
 # Misc
 var grounded: bool
 var groundedRayResult
+var gameStateMachine: Node
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Assign variables
+	gameStateMachine = get_parent()
 	joint = $Joint
+	
+	# Grab the correct player models in multiplayer
+	if !singlePlayer:
+		var charKey = "char1" if (topController == 0) else "char2"
+		topModel = PlayerData.character_selections[charKey]["top_mesh"]
+		bottomModel = PlayerData.character_selections[charKey]["bottom_mesh"]
+		
+		if PlayerData.character_selections[charKey]["top_pose"] != null:
+			activeArmPose = PlayerData.character_selections[charKey]["top_pose"]
+		## char1
+		#if (topController == 0):
+			#topModel = PlayerData.character_selections["char1"]["top_mesh"]
+			#bottomModel = PlayerData.character_selections["char1"]["bottom_mesh"]
+		## char2
+		#else:
+			#topModel = PlayerData.character_selections["char2"]["top_mesh"]
+			#bottomModel = PlayerData.character_selections["char2"]["bottom_mesh"]
+	#
+	else:
+		if topModel == "res://Character/mech_top.tscn":
+			activeArmPose = CHARACTER_ARM_POSES["Mecha"]
+		else:
+			activeArmPose = CHARACTER_ARM_POSES["Scarecrow"]
+	var Top = load(topModel).instantiate()
+	add_child(Top)
+	var Bottom = load(bottomModel).instantiate()
+	add_child(Bottom)
+	
+	
 	topBoneSim = $Top/ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D
 	bottomBoneSim = $Bottom/ArmatureBottom/Skeleton3D/PhysicalBoneSimulator3D
 	# Start bone simulation
@@ -134,6 +196,16 @@ func _ready() -> void:
 	# Connect bodies
 	joint.node_a = bottomJoint.get_path()
 	joint.node_b = topJoint.get_path()
+	# Set joint params
+	joint.set_param_x(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.0)
+	joint.set_param_y(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.0)
+	joint.set_param_z(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.0)
+	joint.set_param_x(Generic6DOFJoint3D.PARAM_ANGULAR_FORCE_LIMIT, 0.0)
+	joint.set_param_y(Generic6DOFJoint3D.PARAM_ANGULAR_FORCE_LIMIT, 0.0)
+	joint.set_param_z(Generic6DOFJoint3D.PARAM_ANGULAR_FORCE_LIMIT, 0.0)
+	joint.set_param_x(Generic6DOFJoint3D.PARAM_LINEAR_SPRING_STIFFNESS, 0.0)
+	joint.set_param_y(Generic6DOFJoint3D.PARAM_LINEAR_SPRING_STIFFNESS, 0.0)
+	joint.set_param_z(Generic6DOFJoint3D.PARAM_LINEAR_SPRING_STIFFNESS, 0.0)
 	# Assign variables
 	rightCalf = bottomBoneSim.get_node('Physical Bone CalfR') as PhysicalBone3D
 	leftCalf = bottomBoneSim.get_node('Physical Bone CalfL') as PhysicalBone3D
@@ -178,30 +250,33 @@ func _ready() -> void:
 
 # Runs on physics tick
 func _physics_process(delta: float) -> void:
-	# Check to see if body should be upright (only if body is close to ground), Character and Joint never actually move
-	var query = PhysicsRayQueryParameters3D.create(bottomJoint.global_position, bottomJoint.global_position + Vector3.DOWN * heightToRunMaintenance)
-	# Hit only layer 4 (4th bit position for 4th layer, 1000 in binary == 8 in decimal)
-	query.collision_mask = 8
-	var space = get_world_3d().direct_space_state
-	groundedRayResult = space.intersect_ray(query)
-	grounded = groundedRayResult.size() > 0
-	# Series of function calls for handling physics and input
-	_handlePlayerInput(delta)
-	if grounded && !splitPlayers:
-		_rotateTowardTarget(otherPlayer.global_position, delta)
-		_keepUpright()
-		_reduceMovement()
-		_setTopTransform()
-	if splitPlayers:
-		_tryReconnect(delta)
-	# Update safety timer if need be
-	if safetyTimer > 0.0:
-		safetyTimer -= delta
-		if safetyTimer < 0.0:
-			safetyTimer = 0.0
-	# Update parent
-	if !splitPlayers || (splitPlayers && otherPlayer.splitPlayers):
-		global_position = (bottomJoint.global_position + topJoint.global_position) / 2.0
+	# Don't run if paused
+	if gameStateMachine.currentState > 1 && gameStateMachine.currentState < 4:
+		# Check to see if body should be upright (only if body is close to ground), Character and Joint never actually move
+		var query = PhysicsRayQueryParameters3D.create(bottomJoint.global_position, bottomJoint.global_position + Vector3.DOWN * heightToRunMaintenance)
+		# Hit only layer 4 (4th bit position for 4th layer, 1000 in binary == 8 in decimal)
+		query.collision_mask = 8
+		var space = get_world_3d().direct_space_state
+		groundedRayResult = space.intersect_ray(query)
+		grounded = groundedRayResult.size() > 0
+		# Series of function calls for handling physics and input
+		if grounded && !splitPlayers:
+			_rotateTowardTarget(otherPlayer.global_position, delta)
+			_setTopTransform()
+		if !splitPlayers:
+			_reduceMovement()
+			_keepUpright()
+		if splitPlayers:
+			_tryReconnect(delta)
+		_handlePlayerInput(delta)
+		# Update safety timer if need be
+		if safetyTimer > 0.0:
+			safetyTimer -= delta
+			if safetyTimer < 0.0:
+				safetyTimer = 0.0
+		# Update parent
+		if !splitPlayers || (splitPlayers && otherPlayer.splitPlayers):
+			global_position = (bottomJoint.global_position + topJoint.global_position) / 2.0
 
 # Keep the body upright
 func _keepUpright() -> void:
@@ -220,15 +295,28 @@ func _keepUpright() -> void:
 	# Rotate torso, apply oppsoite rotation to pelvis to avoid spinning forever
 	topJoint.angular_velocity += correction
 	bottomJoint.angular_velocity -= correction
-	# If angle is close enough to being upright, keep character standing up
-	if angle < 5.0:
+	# If angle is close enough to being upright and on the ground, keep character standing up
+	if angle < 3.0 && grounded:
 		if groundedRayResult.position.y + 0.75 > bottomJoint.global_position.y:
 			topJoint.linear_velocity += Vector3.UP * abs(groundedRayResult.position.y - bottomJoint.global_position.y) * 0.5
 
-# Reduce movement to make player slide less
+# Reduce core movement to make player slide less if grounded, or reduce limb movement if in the air to stop flying
 func _reduceMovement() -> void:
-	topJoint.linear_velocity *= bodyDamping
-	bottomJoint.linear_velocity *= bodyDamping
+	if grounded:
+		topJoint.linear_velocity *= bodyDamping
+		bottomJoint.linear_velocity *= bodyDamping
+	else:
+		rightCalf.linear_velocity *= airDamping
+		leftCalf.linear_velocity *= airDamping
+		rightUpperArm.linear_velocity *= airDamping
+		leftUpperArm.linear_velocity *= airDamping
+	
+# Reduce limb movement to avoid flying away
+func _reduceAirMovement() -> void:
+	rightCalf.linear_velocity *= bodyDamping
+	leftCalf.linear_velocity *= bodyDamping
+	rightUpperArm.linear_velocity *= bodyDamping
+	leftUpperArm.linear_velocity *= bodyDamping
 
 # Rotate parent toward the target Vector3
 # THIS IS CAUSING THE CHARACTER TO FLY WHEN MID-AIR
@@ -262,15 +350,16 @@ func _handlePlayerInput(delta: float) -> void:
 	var topX = Input.is_joy_button_pressed(topController, JOY_BUTTON_X)
 	var topY = Input.is_joy_button_pressed(topController, JOY_BUTTON_Y)
 	# Run punch button function regardless of input to keep timers running
-	var punchInput =  _armButtonHeld(topB, HeldButtonID.TopB, delta) - _armButtonHeld(topX, HeldButtonID.TopX, delta)
+	var rightArmAction = _armButtonHeld(topB, HeldButtonID.TopB, delta)
+	var leftArmAction = _armButtonHeld(topX, HeldButtonID.TopX, delta)
 	var legInput = Vector2(_legButtonHeld(bottomB, HeldButtonID.BottomB, delta) - _legButtonHeld(bottomX, HeldButtonID.BottomX, delta), (1.0 if bottomY else 0.0))
 	# Read thumbstick inputs, use buttons if they're being pressed
 	var topRightThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(topController, JOY_AXIS_RIGHT_Y))
-	if punchInput != 0.0:
-		topRightThumbstick.x = punchInput
+	if rightArmAction != Vector2.ZERO:
+		topRightThumbstick = rightArmAction
 	var topLeftThumbstick = Vector2(Input.get_joy_axis(topController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(topController, JOY_AXIS_LEFT_Y))
-	if punchInput != 0.0:
-		topLeftThumbstick.x = punchInput
+	if leftArmAction != Vector2.ZERO:
+		topLeftThumbstick = leftArmAction
 	var bottomRightThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_RIGHT_Y))
 		if !((bottomB || bottomX) && !alternateLegs) && !bottomY else legInput)
 	var bottomLeftThumbstick = (Vector2(Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_X),-Input.get_joy_axis(bottomController, JOY_AXIS_LEFT_Y))
@@ -417,19 +506,37 @@ func _legButtonHeld(heldButton: bool, id: HeldButtonID, delta: float) -> float:
 		return 0.0
 
 # Handle holding down an arm button, outputting -1, and, upon release, outputting 1 for a bit
-func _armButtonHeld(heldButton: bool, id: HeldButtonID, delta: float) -> float:
+func _armButtonHeld(heldButton: bool, id: HeldButtonID, delta: float) -> Vector2:
 	# Get index based on arm, only supports these 2 (can come up with more refined approach later)
-	var index = (0 if id == 5 else (1 if id == 6 else -1))
+	#var index = (0 if id == 5 else (1 if id == 6 else -1))
+	var index = (0 if id == HeldButtonID.TopB else (1 if id == HeldButtonID.TopX else -1))
 	# If button held
 	if heldButton:
-		armStates[index] = clampf(armStates[index] + delta * armHeldTimeMultiplier, minArmReleaseTime, maxArmReleaseTime)
-		return -1.0
+		armReleaseTimers[index] = 0.0
+		armChargeTimers[index] = clampf(armChargeTimers[index] + delta, 0.0, maxPunchChargeTime)
+		var chargeRatio = armChargeTimers[index] / maxPunchChargeTime
+		return activeArmPose["windup"] * lerpf(0.25, 1.0, chargeRatio)
+		
+	elif armChargeTimers[index] > 0.0:
+		# Button released
+		var chargeRatio = armChargeTimers[index] / maxPunchChargeTime
+		armPunchStrengths[index] = lerpf(1.0, maxPunchForceMultiplier, chargeRatio)
+		armReleaseTimers[index] = punchExtendDuration
+		armChargeTimers[index] = 0.0
+		
+	if armReleaseTimers[index] > 0.0:
+		armReleaseTimers[index] -= delta
+		return activeArmPose["release"] * armPunchStrengths[index]
+		
+	return Vector2.ZERO
+		#armStates[index] = clampf(armStates[index] + delta * armHeldTimeMultiplier, minArmReleaseTime, maxArmReleaseTime)
+		#return -1.0
 	# If button released and timer must run
-	if !heldButton && armStates[index] > minArmReleaseTime:
-		armStates[index] = clampf(armStates[index] - delta, minArmReleaseTime, maxArmReleaseTime)
-		return 1.0
-	# Nothing is happening
-	return 0.0
+	#if !heldButton && armStates[index] > minArmReleaseTime:
+		#armStates[index] = clampf(armStates[index] - delta, minArmReleaseTime, maxArmReleaseTime)
+		#return 1.0
+	## Nothing is happening
+	#return 0.0
 
 # Alternate face button variable based on button ID
 func _alternateFaceButtonVariable(id: HeldButtonID):
@@ -483,17 +590,28 @@ func _setTopTransform() -> void:
 # Depending on splitPlayers, either split the bodies or reconnect them
 func _splitPlayers(split: bool) -> void:
 	# Split >> not split, reconnect
+	camera._startCameraShake(0.2, 0.15)
 	if !split:
+		topBoneSim.physical_bones_stop_simulation()
+		bottomBoneSim.physical_bones_stop_simulation()
+		await get_tree().physics_frame
+		# Get all bones, set velocities to 0
 		bottomJoint.angular_velocity = Vector3.ZERO
 		bottomJoint.linear_velocity = Vector3.ZERO
 		topJoint.angular_velocity = Vector3.ZERO
 		topJoint.linear_velocity = Vector3.ZERO
-		await get_tree().physics_frame
+		rightCalf.linear_velocity = Vector3.ZERO
+		leftCalf.linear_velocity = Vector3.ZERO
+		rightUpperArm.linear_velocity = Vector3.ZERO
+		leftUpperArm.linear_velocity = Vector3.ZERO
 		_setTopTransform()
 		joint.node_a = bottomJoint.get_path()
 		joint.node_b = topJoint.get_path()
 		splitPlayers = false
 		safetyTimer = safetyTimerAfterReconnection
+		await get_tree().physics_frame
+		topBoneSim.physical_bones_start_simulation()
+		bottomBoneSim.physical_bones_start_simulation()
 		return
 	# Not split >> split, disconnect the bodies
 	joint.node_a = NodePath("")
