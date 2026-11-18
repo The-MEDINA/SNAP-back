@@ -56,4 +56,4 @@ shadow_enabled = true
 shadow_blur = 0.5
 
 [node name="MechRigTop" parent="." unique_id=1023642976 instance=ExtResource("1_42pth")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.97414947, -1.0685565, -0.25817323)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3336313, -1.0685565, -0.25817323)

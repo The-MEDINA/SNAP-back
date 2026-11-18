@@ -15,4 +15,5 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 		var collider = state.get_contact_collider_object(i)
 		var force = state.get_contact_impulse(i) / state.step
 		if force.length() > 0.0:
+			pass
 			parent._receiveForce(self, force, collider)

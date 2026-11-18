@@ -166,14 +166,14 @@ func _ready() -> void:
 		if PlayerData.character_selections[charKey]["top_pose"] != null:
 			activeArmPose = PlayerData.character_selections[charKey]["top_pose"]
 		## char1
-		#if (topController == 0):
-			#topModel = PlayerData.character_selections["char1"]["top_mesh"]
-			#bottomModel = PlayerData.character_selections["char1"]["bottom_mesh"]
-		## char2
-		#else:
-			#topModel = PlayerData.character_selections["char2"]["top_mesh"]
-			#bottomModel = PlayerData.character_selections["char2"]["bottom_mesh"]
-	#
+		if (topController == 0):
+			topModel = PlayerData.character_selections["char1"]["top_mesh"]
+			bottomModel = PlayerData.character_selections["char1"]["bottom_mesh"]
+		# char2
+		else:
+			topModel = PlayerData.character_selections["char2"]["top_mesh"]
+			bottomModel = PlayerData.character_selections["char2"]["bottom_mesh"]
+	
 	else:
 		if topModel == "res://Character/mech_top.tscn":
 			activeArmPose = CHARACTER_ARM_POSES["Mecha"]
