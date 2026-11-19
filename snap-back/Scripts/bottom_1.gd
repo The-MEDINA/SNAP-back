@@ -1,5 +1,5 @@
 extends Node3D
-
+@export var height: float 
 
 func _ready() -> void:
 	# starts tha ragdoll simulation

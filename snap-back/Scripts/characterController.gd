@@ -9,7 +9,7 @@ extends Node3D
 # Physics values
 @export var upperArmMovementStrength = 1.5
 @export var calfMovementStrength = 5.0
-@export var heightToRunMaintenance = 0.85
+@export var heightToRunMaintenance = 0.975
 @export var uprightMaintenanceStrength = 65.0
 @export var rotationSpeed = 17.5
 @export var rotationDamping = 600.0
@@ -165,7 +165,7 @@ func _ready() -> void:
 		
 		if PlayerData.character_selections[charKey]["top_pose"] != null:
 			activeArmPose = PlayerData.character_selections[charKey]["top_pose"]
-		## char1
+		# char1
 		if (topController == 0):
 			topModel = PlayerData.character_selections["char1"]["top_mesh"]
 			bottomModel = PlayerData.character_selections["char1"]["bottom_mesh"]
@@ -183,7 +183,8 @@ func _ready() -> void:
 	add_child(Top)
 	var Bottom = load(bottomModel).instantiate()
 	add_child(Bottom)
-	
+	# grab the height from the bottom model and set
+	heightToRunMaintenance = Bottom.height
 	
 	topBoneSim = $Top/ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D
 	bottomBoneSim = $Bottom/ArmatureBottom/Skeleton3D/PhysicalBoneSimulator3D
