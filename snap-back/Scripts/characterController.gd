@@ -46,7 +46,7 @@ var activeArmPose = CHARACTER_ARM_POSES["Mecha"]
 var activeBottomPose = CHARACTER_LEG_POSES["Mecha"]
 var specialAttackCooldown: float = 0.0
 @export var specialAttackCooldownTime: float = 1.5
-@export var teamSpecialForceMultiplyer: float = 2.5;
+@export var teamSpecialForceMultiplier: float = 2.5;
 
 #Time value for arms 
 @export var maxPunchChargeTime = 1.0 #how many seconds for it to reach 100% punch power
@@ -214,7 +214,8 @@ func _ready() -> void:
 	var Bottom = load(bottomModel).instantiate()
 	add_child(Bottom)
 	# grab the height from the bottom model and set
-	heightToRunMaintenance = Bottom.height
+	if "height" in Bottom:
+		heightToRunMaintenance = Bottom.height
 	
 	topBoneSim = $Top/ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D
 	bottomBoneSim = $Bottom/ArmatureBottom/Skeleton3D/PhysicalBoneSimulator3D
@@ -724,7 +725,7 @@ func _triggerCombinedSpecial() -> void:
 	if toOpponent.length_squared() > 0.0:
 		toOpponent = toOpponent.normalized()
 	
-	var mult = teamSpecialForceMultiplyer
+	var mult = teamSpecialForceMultiplier
 	
 	# Dummy Bottom 
 	if activeBottomPose == CHARACTER_LEG_POSES["Dummy"]:

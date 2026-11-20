@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dqnm3d2ysdit6"
-path.s3tc="res://.godot/imported/DummyCombinedTop_DummyLP_DefaultMaterial_Normal.png-62293cd6c789c22807eb63bb0f6526ad.s3tc.ctex"
+uid="uid://b5nevcywtot23"
+path.s3tc="res://.godot/imported/DummyRigTop_DummyLP_DefaultMaterial_Normal.png-616103695dcba233ee790d9e6bb32233.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -14,8 +14,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://Character/Dummy/DummyCombinedTop_DummyLP_DefaultMaterial_Normal.png"
-dest_files=["res://.godot/imported/DummyCombinedTop_DummyLP_DefaultMaterial_Normal.png-62293cd6c789c22807eb63bb0f6526ad.s3tc.ctex"]
+source_file="res://Character/Dummy/DummyRigTop_DummyLP_DefaultMaterial_Normal.png"
+dest_files=["res://.godot/imported/DummyRigTop_DummyLP_DefaultMaterial_Normal.png-616103695dcba233ee790d9e6bb32233.s3tc.ctex"]
 
 [params]
 
@@ -30,7 +30,7 @@ compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=1
-roughness/src_normal="res://Character/Dummy/DummyCombinedTop_DummyLP_DefaultMaterial_Normal.png"
+roughness/src_normal="res://Scenes/DummyRigTop_DummyLP_DefaultMaterial_Normal.png"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

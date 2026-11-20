@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://csyhgli11t3oy"
-path="res://.godot/imported/DummyCombinedBottom.glb-3f1c5479a510b36cb8adb3edb25e191b.scn"
+uid="uid://d1v6q0age4yqm"
+path="res://.godot/imported/DummyRigBottom.glb-804ecc7ab35581e8f95bdaa1e8f8bf03.scn"
 
 [deps]
 
-source_file="res://Character/Dummy/DummyCombinedBottom.glb"
-dest_files=["res://.godot/imported/DummyCombinedBottom.glb-3f1c5479a510b36cb8adb3edb25e191b.scn"]
+source_file="res://Character/Dummy/DummyRigBottom.glb"
+dest_files=["res://.godot/imported/DummyRigBottom.glb-804ecc7ab35581e8f95bdaa1e8f8bf03.scn"]
 
 [params]
 
@@ -41,7 +41,7 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "meshes": {
-"DummyCombinedBottom_Torus_005": {
+"DummyRigBottom_Torus_005": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,
 "generate/shadow_meshes": 0,

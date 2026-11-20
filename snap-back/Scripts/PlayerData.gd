@@ -69,47 +69,50 @@ func mesh_index_to_tscn_path(p1_selection: int, p2_selection: int, p3_selection:
 				pass
 
 	pass
-
-func set_top(char, mesh, index):
+func set_top(char_key: String, mesh: String, index: int) -> void:
 	match index:
-		# Mech -> Pulls back and punches stright forward
+		# 0: Mech
 		0:
-			character_selections[char][mesh] = "res://Character/Mech/mech_top.tscn"
-			character_selections[char]["top_pose"] = {
+			character_selections[char_key][mesh] = "res://Character/Mech/mech_top.tscn"
+			character_selections[char_key]["top_pose"] = {
 				"windup": Vector2(-1.0, 0.0),
 				"release": Vector2(1.0, 0.0)
 			}
-		#1: 
-			#character_selections[char][mesh] = "res://Character/Mech/mech_top.tscn"
-			#character_selections[char]["top_pose"] = {
-				#"windup": Vector2(-1.0, 0.0),
-				#"release": Vector2(1.0, 0.0)
-			#}
-		# Debug model
-		_:
-			character_selections[char][mesh] = "res://Character/top.tscn"
-			character_selections[char]["top_pose"] = {
+		# 1: Dummy
+		1:
+			character_selections[char_key][mesh] = "res://Character/Dummy/DummyRigTop.glb"
+			character_selections[char_key]["top_pose"] = {
 				"windup": Vector2(-0.3, -0.8),
 				"release": Vector2(0.1, 1.0)
 			}
-	pass
-	
-func set_bottom(char, mesh, index):
+		# 2 / Default
+		_:
+			character_selections[char_key][mesh] = "res://Character/top.tscn"
+			character_selections[char_key]["top_pose"] = {
+				"windup": Vector2(-0.3, -0.8),
+				"release": Vector2(0.1, 1.0)
+			}
+
+func set_bottom(char_key: String, mesh: String, index: int) -> void:
 	match index:
-		# Mech
+		# 0: Mech
 		0:
-			character_selections[char][mesh] = "res://Character/Mech/mech_bottom.tscn"
-			character_selections[char]["bottom_pose"] = {
+			character_selections[char_key][mesh] = "res://Character/Mech/mech_bottom.tscn"
+			character_selections[char_key]["bottom_pose"] = {
 				"left_leg": Vector2(-0.6, -0.8),
 				"right_leg": Vector2(0.6, -0.8)
 			}
-		#1: 
-			#character_selections[char][mesh] = "res://Character/Mech/mech_top.tscn"
-			#character_selections[char]["top_psose"] = {
-				#"left_leg": Vector2(-1.0, 0.25),
-				#"right_leg": Vector2(1.0, 0.25)
-			#}
-		# Debug model
+		# 1: Dummy -> Split Pose
+		1:
+			character_selections[char_key][mesh] = "res://Character/Dummy/DummyRigBottom.glb"
+			character_selections[char_key]["bottom_pose"] = {
+				"left_leg": Vector2(-1.0, 0.25),
+				"right_leg": Vector2(1.0, 0.25)
+			}
+		# 2 / Default
 		_:
-			character_selections[char][mesh] = "res://Character/bottom_1.tscn"
-	pass
+			character_selections[char_key][mesh] = "res://Character/bottom_1.tscn"
+			character_selections[char_key]["bottom_pose"] = {
+				"left_leg": Vector2(-1.0, 0.25),
+				"right_leg": Vector2(1.0, 0.25)
+			}

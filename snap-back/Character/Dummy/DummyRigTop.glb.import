@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dcmcesdxqnexo"
-path="res://.godot/imported/DummyCombinedTop.glb-c5a7711d82928462510675c78cc5fd5a.scn"
+uid="uid://b3v473wbi1rso"
+path="res://.godot/imported/DummyRigTop.glb-3af0db39a554d20906c692b186d61dad.scn"
 
 [deps]
 
-source_file="res://Character/Dummy/DummyCombinedTop.glb"
-dest_files=["res://.godot/imported/DummyCombinedTop.glb-c5a7711d82928462510675c78cc5fd5a.scn"]
+source_file="res://Character/Dummy/DummyRigTop.glb"
+dest_files=["res://.godot/imported/DummyRigTop.glb-3af0db39a554d20906c692b186d61dad.scn"]
 
 [params]
 
@@ -41,7 +41,7 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "meshes": {
-"DummyCombinedTop_Cylinder_002": {
+"DummyRigTop_Torus_003": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,
 "generate/shadow_meshes": 0,
@@ -49,6 +49,15 @@ _subresources={
 "save_to_file/enabled": true,
 "save_to_file/fallback_path": "res://Character/Dummy/Dummy_Top.res",
 "save_to_file/path": "uid://c7ubjxy28xlmt"
+},
+"DummyRigTop_Torus_005": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Character/Dummy/Dummy_Bottom.res",
+"save_to_file/path": "uid://kr8pbo2axcp5"
 }
 }
 }
