@@ -1,9 +1,11 @@
 [gd_resource type="Resource" script_class="PartOption" format=3 uid="uid://br74nia7nd5x3"]
 
 [ext_resource type="Script" uid="uid://11cu0aac0dfw" path="res://Scripts/PartOption.gd" id="1_clajn"]
+[ext_resource type="ArrayMesh" uid="uid://bxnobkedx8yeo" path="res://Character/Default_Top.res" id="1_wbpo6"]
 
 [resource]
 script = ExtResource("1_clajn")
 name = "Default"
 role = "Normal"
+mesh = ExtResource("1_wbpo6")
 metadata/_custom_type_script = "uid://11cu0aac0dfw"
