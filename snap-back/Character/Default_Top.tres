@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="PartOption" format=3 uid="uid://br74nia7nd5x3"]
+
+[ext_resource type="Script" uid="uid://11cu0aac0dfw" path="res://Scripts/PartOption.gd" id="1_clajn"]
+
+[resource]
+script = ExtResource("1_clajn")
+name = "Default"
+role = "Normal"
+metadata/_custom_type_script = "uid://11cu0aac0dfw"
