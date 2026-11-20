@@ -46,6 +46,7 @@ var activeArmPose = CHARACTER_ARM_POSES["Mecha"]
 var activeBottomPose = CHARACTER_LEG_POSES["Mecha"]
 var specialAttackCooldown: float = 0.0
 @export var specialAttackCooldownTime: float = 1.5
+@export var teamSpecialForceMultiplyer: float = 2.5;
 
 #Time value for arms 
 @export var maxPunchChargeTime = 1.0 #how many seconds for it to reach 100% punch power
@@ -723,16 +724,31 @@ func _triggerCombinedSpecial() -> void:
 	if toOpponent.length_squared() > 0.0:
 		toOpponent = toOpponent.normalized()
 	
-	# Dummy Bottom -> Spinning Mid-Air Split Attack
+	var mult = teamSpecialForceMultiplyer
+	
+	# Dummy Bottom 
 	if activeBottomPose == CHARACTER_LEG_POSES["Dummy"]:
-		bottomJoint.linear_velocity += Vector3.UP * 8.0 + toOpponent * 10.0
-		topJoint.linear_velocity += Vector3.UP * 8.0 + toOpponent * 10.0
-		topJoint.angular_velocity.y += 25.0
-		rightCalf.linear_velocity += rightCalf.global_transform.basis.x * 12.0
-		leftCalf.linear_velocity -= leftCalf.global_transform.basis.x * 12.0
-	# Mech Bottom -> Heavy Hydraulic Rocket Dash
+		bottomJoint.linear_velocity += (Vector3.UP * 12.0 + toOpponent * 22.0) * mult
+		topJoint.linear_velocity += (Vector3.UP * 12.0 + toOpponent * 22.0) * mult
+		topJoint.angular_velocity.y += 45.0 * mult
+		bottomJoint.angular_velocity.y += 45.0 * mult
+		
+		# Snap legs outward with high impact velocity
+		var sideDir = camera.global_transform.basis.x
+		sideDir.y = 0
+		sideDir = sideDir.normalized()
+		rightCalf.linear_velocity += (sideDir * 25.0 + toOpponent * 20.0) * mult
+		leftCalf.linear_velocity += (-sideDir * 25.0 + toOpponent * 20.0) * mult
+		
+		# Whip the arms out too for wider spinning hitboxes
+		rightForearm.linear_velocity += (sideDir * 25.0 + toOpponent * 20.0) * mult
+		leftForearm.linear_velocity += (-sideDir * 25.0 + toOpponent * 20.0) * mult
+
+	# Mech Bottom 
 	else:
-		bottomJoint.linear_velocity += Vector3.UP * 5.0 + toOpponent * 18.0
-		topJoint.linear_velocity += Vector3.UP * 5.0 + toOpponent * 18.0
-		rightForearm.linear_velocity += toOpponent * 22.0
-		leftForearm.linear_velocity += toOpponent * 22.0
+		bottomJoint.linear_velocity += (Vector3.UP * 7.0 + toOpponent * 32.0) * mult
+		topJoint.linear_velocity += (Vector3.UP * 7.0 + toOpponent * 32.0) * mult
+		rightForearm.linear_velocity += toOpponent * 45.0 * mult
+		leftForearm.linear_velocity += toOpponent * 45.0 * mult
+		rightUpperArm.linear_velocity += toOpponent * 30.0 * mult
+		leftUpperArm.linear_velocity += toOpponent * 30.0 * mult
