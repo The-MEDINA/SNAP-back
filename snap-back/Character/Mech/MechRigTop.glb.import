@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://ca68plew8pio0"
-path="res://.godot/imported/Default_Bottom.glb-7eb1f3f835146ae5eb545049d31ffa5c.scn"
+uid="uid://bncu8bcy4h7fw"
+path="res://.godot/imported/MechRigTop.glb-7de7bd18d438e94dd56c5a43f6d1cee7.scn"
 
 [deps]
 
-source_file="res://Character/Default_Bottom.glb"
-dest_files=["res://.godot/imported/Default_Bottom.glb-7eb1f3f835146ae5eb545049d31ffa5c.scn"]
+source_file="res://Character/Mech/MechRigTop.glb"
+dest_files=["res://.godot/imported/MechRigTop.glb-7de7bd18d438e94dd56c5a43f6d1cee7.scn"]
 
 [params]
 
@@ -41,14 +41,14 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "meshes": {
-"Default_Bottom_Bottom1_Cube_008": {
+"MechRigTop_Cube_002": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,
 "generate/shadow_meshes": 0,
 "lods/normal_merge_angle": 20.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://Character/Default_Bottom.res",
-"save_to_file/path": "uid://cmm6kcxsqqi6u"
+"save_to_file/fallback_path": "res://Assets/Models/RobotTop.res",
+"save_to_file/path": "uid://b7mcau7tmylae"
 }
 }
 }
