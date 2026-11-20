@@ -4,16 +4,18 @@
 [ext_resource type="Script" uid="uid://11cu0aac0dfw" path="res://Scripts/PartOption.gd" id="2_g8vv5"]
 [ext_resource type="Resource" uid="uid://br74nia7nd5x3" path="res://Character/Default/Default_Top.tres" id="3_54b3v"]
 [ext_resource type="Resource" uid="uid://c57gwhiqjj1ka" path="res://Character/Mech/Mecha_Top.tres" id="5_3h6c6"]
+[ext_resource type="Resource" uid="uid://1gjbnl2kfpym" path="res://Character/Dummy/Dummy_Top.tres" id="5_a5c7b"]
 [ext_resource type="Resource" uid="uid://bbixpfhktlsfc" path="res://Character/Default/Default_Bottom.tres" id="5_x2wrf"]
 [ext_resource type="Script" uid="uid://bk758eu6a67ud" path="res://Scripts/4CharacterController.gd" id="7_54b3v"]
+[ext_resource type="Resource" uid="uid://4621tj5i28di" path="res://Character/Dummy/Dummy_Bottom.tres" id="8_rqetd"]
 [ext_resource type="Resource" uid="uid://ds4vss5qa4bxr" path="res://Character/Mech/Mecha_Bottom.tres" id="8_x2wrf"]
 
 [node name="CharacterSelect" type="Control" unique_id=480896808]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_rkapk")
-top_options = Array[ExtResource("2_g8vv5")]([ExtResource("3_54b3v"), ExtResource("5_3h6c6")])
-bottom_options = Array[ExtResource("2_g8vv5")]([ExtResource("5_x2wrf"), ExtResource("8_x2wrf")])
+top_options = Array[ExtResource("2_g8vv5")]([ExtResource("5_3h6c6"), ExtResource("5_a5c7b"), ExtResource("3_54b3v")])
+bottom_options = Array[ExtResource("2_g8vv5")]([ExtResource("8_x2wrf"), ExtResource("8_rqetd"), ExtResource("5_x2wrf")])
 
 [node name="MainHBoxContainer" type="HBoxContainer" parent="." unique_id=1041881688]
 layout_mode = 1

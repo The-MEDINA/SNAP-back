@@ -3,8 +3,8 @@
 extends Node3D
 
 # Models
-@export var topModel = "res://Character/top.tscn"
-@export var bottomModel = "res://Character/bottom_1.tscn"
+@export var topModel = "res://Character/Mech/mech_top.tscn"
+@export var bottomModel = "res://Character/Mech/mech_bottom.tscn"
 
 # Physics values
 @export var upperArmMovementStrength = 1.5
@@ -24,14 +24,28 @@ const CHARACTER_ARM_POSES = {
 		"windup": Vector2(-1.0, 0.0),  # Pulls arm straight back
 		"release": Vector2(1.0, 0.0)   # Punches straight forward
 	},
-	"Scarecrow": {
+	"Dummy": {
 		"windup": Vector2(-0.3, -0.8), # Pulls arm slightly back and down
 		"release": Vector2(0.1, 1.0)   # Shoots hand straight up
 	}
 }
 
+const CHARACTER_LEG_POSES = {
+	"Mecha": {
+		"left_leg": Vector2(-0.6, -0.8),  # Pulls arm straight back
+		"right_leg": Vector2(0.6, -0.8)   # Punches straight forward
+	},
+	"Dummy": {
+		"left_leg": Vector2(-1.0, 0.25),  # Pulls arm straight back
+		"right_leg": Vector2(1.0, 0.25)  
+	}
+}
+
 #For now default the character pose to Mecha (punch)
 var activeArmPose = CHARACTER_ARM_POSES["Mecha"]
+var activeBottomPose = CHARACTER_LEG_POSES["Mecha"]
+var specialAttackCooldown: float = 0.0
+@export var specialAttackCooldownTime: float = 1.5
 
 #Time value for arms 
 @export var maxPunchChargeTime = 1.0 #how many seconds for it to reach 100% punch power
@@ -165,20 +179,35 @@ func _ready() -> void:
 		
 		if PlayerData.character_selections[charKey]["top_pose"] != null:
 			activeArmPose = PlayerData.character_selections[charKey]["top_pose"]
-		# char1
-		if (topController == 0):
-			topModel = PlayerData.character_selections["char1"]["top_mesh"]
-			bottomModel = PlayerData.character_selections["char1"]["bottom_mesh"]
-		# char2
-		else:
-			topModel = PlayerData.character_selections["char2"]["top_mesh"]
-			bottomModel = PlayerData.character_selections["char2"]["bottom_mesh"]
-	
+			
+		if PlayerData.character_selections[charKey]["bottom_pose"] != null:
+			activeBottomPose = PlayerData.character_selections[charKey]["bottom_pose"]
+			leftLegPose = activeBottomPose["left_leg"]
+			rightLegPose = activeBottomPose["right_leg"]
+		#
+		## char1
+		#if (topController == 0):
+			#topModel = PlayerData.character_selections["char1"]["top_mesh"]
+			#bottomModel = PlayerData.character_selections["char1"]["bottom_mesh"]
+		## char2
+		#else:
+			#topModel = PlayerData.character_selections["char2"]["top_mesh"]
+			#bottomModel = PlayerData.character_selections["char2"]["bottom_mesh"]
+	#
 	else:
-		if topModel == "res://Character/mech_top.tscn":
-			activeArmPose = CHARACTER_ARM_POSES["Mecha"]
-		else:
-			activeArmPose = CHARACTER_ARM_POSES["Scarecrow"]
+		match topModel:
+			"res://Character/Mech/MechRigTop.glb", "res://Character/Mech/mech_top.tscn":
+				activeArmPose = CHARACTER_ARM_POSES["Mecha"]
+			_:
+				activeArmPose = CHARACTER_ARM_POSES["Dummy"]
+		match bottomModel:
+			"res://Character/Mech/MechRigBottom.glb", "res://Character/Mech/mech_bottom.tscn":
+				activeBottomPose = CHARACTER_LEG_POSES["Mecha"]
+			_:
+				activeBottomPose = CHARACTER_LEG_POSES["Dummy"]
+		
+		leftLegPose = activeBottomPose["left_leg"]
+		rightLegPose = activeBottomPose["right_leg"]
 	var Top = load(topModel).instantiate()
 	add_child(Top)
 	var Bottom = load(bottomModel).instantiate()
@@ -377,9 +406,29 @@ func _handlePlayerInput(delta: float) -> void:
 		print("ARM POSE")
 		pass
 	# Detect pose for legs
-	if bottomRightThumbstick.dot(rightLegPose) > inputPoseForgiveness && bottomLeftThumbstick.dot(leftLegPose) > inputPoseForgiveness:
-		print("LEG POSE")
-		pass
+	#if bottomRightThumbstick.dot(rightLegPose) > inputPoseForgiveness && bottomLeftThumbstick.dot(leftLegPose) > inputPoseForgiveness:
+		#print("LEG POSE")
+		#pass
+	## Save last button values
+	#lastBottomX = bottomX
+	#lastBottomB = bottomB
+	## Turn thumbsticks into relative Vector3s to use on body
+	#var rightUpperArmInput = _makeRelativeToCamera(topRightThumbstick) if !splitPlayers else _makeRelativeForSplit(topRightThumbstick, rightUpperArm)
+	#var leftUpperArmInput = _makeRelativeToCamera(topLeftThumbstick) if !splitPlayers else _makeRelativeForSplit(topLeftThumbstick, leftUpperArm)
+	#var rightCalfInput = _makeRelativeToCamera(bottomRightThumbstick) if !splitPlayers else _makeRelativeForSplit(bottomRightThumbstick, rightCalf)
+	#var leftCalfInput = _makeRelativeToCamera(bottomLeftThumbstick) if !splitPlayers else _makeRelativeForSplit(bottomLeftThumbstick, leftCalf)
+	if specialAttackCooldown > 0.0:
+		specialAttackCooldown -= delta
+
+	# Detect pose for arms and legs
+	var isArmPosing = topRightThumbstick.dot(rightArmPose) > inputPoseForgiveness && topLeftThumbstick.dot(leftArmPose) > inputPoseForgiveness
+	var isLegPosing = bottomRightThumbstick.dot(rightLegPose) > inputPoseForgiveness && bottomLeftThumbstick.dot(leftLegPose) > inputPoseForgiveness
+
+	# Both players posed together -> Fire Combined Special!
+	if isArmPosing && isLegPosing && specialAttackCooldown <= 0.0 && !splitPlayers:
+		_triggerCombinedSpecial()
+		specialAttackCooldown = specialAttackCooldownTime
+
 	# Save last button values
 	lastBottomX = bottomX
 	lastBottomB = bottomB
@@ -388,6 +437,11 @@ func _handlePlayerInput(delta: float) -> void:
 	var leftUpperArmInput = _makeRelativeToCamera(topLeftThumbstick) if !splitPlayers else _makeRelativeForSplit(topLeftThumbstick, leftUpperArm)
 	var rightCalfInput = _makeRelativeToCamera(bottomRightThumbstick) if !splitPlayers else _makeRelativeForSplit(bottomRightThumbstick, rightCalf)
 	var leftCalfInput = _makeRelativeToCamera(bottomLeftThumbstick) if !splitPlayers else _makeRelativeForSplit(bottomLeftThumbstick, leftCalf)
+
+	# Extra outward leg reach when Dummy/Scarecrow hits the split pose
+	if isLegPosing && activeBottomPose == CHARACTER_LEG_POSES["Dummy"]:
+		rightCalfInput *= 1.8
+		leftCalfInput *= 1.8
 	# Read trigger values
 	var topRightTrigger = Input.get_joy_axis(topController, JOY_AXIS_TRIGGER_RIGHT)
 	var topLeftTrigger = Input.get_joy_axis(topController, JOY_AXIS_TRIGGER_LEFT)
@@ -660,3 +714,25 @@ func _tryReconnect(delta: float) -> void:
 	if bottomJoint.global_position.distance_to(topJoint.global_position) < reconnectionDistance:
 		_splitPlayers(false)
 		reconnectionTimer = reconnectionTimerMax
+
+func _triggerCombinedSpecial() -> void:
+	print("TEAM SPECIAL TRIGGERED!")
+	
+	var toOpponent = otherPlayer.global_position - global_position
+	toOpponent.y = 0
+	if toOpponent.length_squared() > 0.0:
+		toOpponent = toOpponent.normalized()
+	
+	# Dummy Bottom -> Spinning Mid-Air Split Attack
+	if activeBottomPose == CHARACTER_LEG_POSES["Dummy"]:
+		bottomJoint.linear_velocity += Vector3.UP * 8.0 + toOpponent * 10.0
+		topJoint.linear_velocity += Vector3.UP * 8.0 + toOpponent * 10.0
+		topJoint.angular_velocity.y += 25.0
+		rightCalf.linear_velocity += rightCalf.global_transform.basis.x * 12.0
+		leftCalf.linear_velocity -= leftCalf.global_transform.basis.x * 12.0
+	# Mech Bottom -> Heavy Hydraulic Rocket Dash
+	else:
+		bottomJoint.linear_velocity += Vector3.UP * 5.0 + toOpponent * 18.0
+		topJoint.linear_velocity += Vector3.UP * 5.0 + toOpponent * 18.0
+		rightForearm.linear_velocity += toOpponent * 22.0
+		leftForearm.linear_velocity += toOpponent * 22.0

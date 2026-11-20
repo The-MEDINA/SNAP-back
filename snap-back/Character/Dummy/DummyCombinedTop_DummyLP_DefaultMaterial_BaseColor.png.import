@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c4a43wnbpbmjq"
-path.s3tc="res://.godot/imported/DummyBottom_DummyLP_DefaultMaterial_Metallic.png-DummyLP_DefaultMaterial_Roughness.png-c9762e6deba3d61e2661b3df3a4b275b.s3tc.ctex"
+uid="uid://cdlspixb4ofnj"
+path.s3tc="res://.godot/imported/DummyCombinedTop_DummyLP_DefaultMaterial_BaseColor.png-eb556593f0e142e3470a22caf1c61c20.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "10475c213357e65ea56ceecc057431e9"
+"md5": "864d33a9126ae956e3e9b726d546ef66"
 }
 
 [deps]
 
-source_file="res://Scenes/DummyBottom_DummyLP_DefaultMaterial_Metallic.png-DummyLP_DefaultMaterial_Roughness.png"
-dest_files=["res://.godot/imported/DummyBottom_DummyLP_DefaultMaterial_Metallic.png-DummyLP_DefaultMaterial_Roughness.png-c9762e6deba3d61e2661b3df3a4b275b.s3tc.ctex"]
+source_file="res://Character/Dummy/DummyCombinedTop_DummyLP_DefaultMaterial_BaseColor.png"
+dest_files=["res://.godot/imported/DummyCombinedTop_DummyLP_DefaultMaterial_BaseColor.png-eb556593f0e142e3470a22caf1c61c20.s3tc.ctex"]
 
 [params]
 

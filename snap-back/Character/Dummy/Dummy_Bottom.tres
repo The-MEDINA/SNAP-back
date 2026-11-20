@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PartOption" format=3 uid="uid://4621tj5i28di"]
+
+[ext_resource type="Script" uid="uid://11cu0aac0dfw" path="res://Scripts/PartOption.gd" id="1_cpw53"]
+[ext_resource type="ArrayMesh" uid="uid://cygast8vi8igm" path="res://Character/Dummy/Dummy_Bottom.res" id="1_fy0ps"]
+
+[resource]
+script = ExtResource("1_cpw53")
+name = "Dummy"
+role = "Splits"
+mesh = ExtResource("1_fy0ps")
+metadata/_custom_type_script = "uid://11cu0aac0dfw"

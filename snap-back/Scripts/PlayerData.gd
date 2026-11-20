@@ -9,7 +9,7 @@ var character_selections = {
 		"top_mesh": null,
 		"bottom_mesh": null,
 		"top_pose": null, #arm charge behvior
-		#"bottom_pose" : null
+		"bottom_pose" : null,
 		"top_player_id": 0,    # P1
 		"bottom_player_id": 1  # P2
 	},
@@ -17,7 +17,7 @@ var character_selections = {
 		"top_mesh": null,
 		"bottom_mesh": null,
 		"top_pose": null, #arm charge behvior
-		#"bottom_pose" : null
+		"bottom_pose" : null,
 		"top_player_id": 2,    # P3
 		"bottom_player_id": 3  # P4
 	}
@@ -74,11 +74,17 @@ func set_top(char, mesh, index):
 	match index:
 		# Mech -> Pulls back and punches stright forward
 		0:
-			character_selections[char][mesh] = "res://Character/mech_top.tscn"
-			character_selections[char]["top_psose"] = {
+			character_selections[char][mesh] = "res://Character/Mech/mech_top.tscn"
+			character_selections[char]["top_pose"] = {
 				"windup": Vector2(-1.0, 0.0),
 				"release": Vector2(1.0, 0.0)
 			}
+		#1: 
+			#character_selections[char][mesh] = "res://Character/Mech/mech_top.tscn"
+			#character_selections[char]["top_pose"] = {
+				#"windup": Vector2(-1.0, 0.0),
+				#"release": Vector2(1.0, 0.0)
+			#}
 		# Debug model
 		_:
 			character_selections[char][mesh] = "res://Character/top.tscn"
@@ -92,7 +98,17 @@ func set_bottom(char, mesh, index):
 	match index:
 		# Mech
 		0:
-			character_selections[char][mesh] = "res://Character/mech_bottom.tscn"
+			character_selections[char][mesh] = "res://Character/Mech/mech_bottom.tscn"
+			character_selections[char]["bottom_pose"] = {
+				"left_leg": Vector2(-0.6, -0.8),
+				"right_leg": Vector2(0.6, -0.8)
+			}
+		#1: 
+			#character_selections[char][mesh] = "res://Character/Mech/mech_top.tscn"
+			#character_selections[char]["top_psose"] = {
+				#"left_leg": Vector2(-1.0, 0.25),
+				#"right_leg": Vector2(1.0, 0.25)
+			#}
 		# Debug model
 		_:
 			character_selections[char][mesh] = "res://Character/bottom_1.tscn"

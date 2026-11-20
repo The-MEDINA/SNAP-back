@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://xlyyy4x2772w"
-path.s3tc="res://.godot/imported/DummyTop_DummyLP_DefaultMaterial_BaseColor.png-a560ec01edb3092a05e1ca0533834b38.s3tc.ctex"
+uid="uid://cuv82ihrgo47t"
+path.s3tc="res://.godot/imported/DummyCombinedBottom_DummyLP_DefaultMaterial_BaseColor.png-841c15781becc93c3356b87b67c52ab4.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -14,8 +14,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://Scenes/DummyTop_DummyLP_DefaultMaterial_BaseColor.png"
-dest_files=["res://.godot/imported/DummyTop_DummyLP_DefaultMaterial_BaseColor.png-a560ec01edb3092a05e1ca0533834b38.s3tc.ctex"]
+source_file="res://Character/Dummy/DummyCombinedBottom_DummyLP_DefaultMaterial_BaseColor.png"
+dest_files=["res://.godot/imported/DummyCombinedBottom_DummyLP_DefaultMaterial_BaseColor.png-841c15781becc93c3356b87b67c52ab4.s3tc.ctex"]
 
 [params]
 

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://ba56ulb6574vj"
-path="res://.godot/imported/DummyBottom.glb-83b646c6465eedd6c0f89990ae428a00.scn"
+uid="uid://csyhgli11t3oy"
+path="res://.godot/imported/DummyCombinedBottom.glb-3f1c5479a510b36cb8adb3edb25e191b.scn"
 
 [deps]
 
-source_file="res://Scenes/DummyBottom.glb"
-dest_files=["res://.godot/imported/DummyBottom.glb-83b646c6465eedd6c0f89990ae428a00.scn"]
+source_file="res://Character/Dummy/DummyCombinedBottom.glb"
+dest_files=["res://.godot/imported/DummyCombinedBottom.glb-3f1c5479a510b36cb8adb3edb25e191b.scn"]
 
 [params]
 
@@ -39,7 +39,19 @@ import_script/path=""
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
-_subresources={}
+_subresources={
+"meshes": {
+"DummyCombinedBottom_Torus_005": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Character/Dummy/Dummy_Bottom.res",
+"save_to_file/path": "uid://kr8pbo2axcp5"
+}
+}
+}
 gltf/naming_version=2
 gltf/embedded_image_handling=1
 gltf/texture_map_mode=1
