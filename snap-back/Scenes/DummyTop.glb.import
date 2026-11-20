@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://ie4cxmjtfs5h"
-path="res://.godot/imported/Default_Top.glb-00d4fe98058a47a41afd4e25b2654c29.scn"
+uid="uid://b6758gb1rvdvj"
+path="res://.godot/imported/DummyTop.glb-31dc108370c962834378264980e22b6c.scn"
 
 [deps]
 
-source_file="res://Character/Default_Top.glb"
-dest_files=["res://.godot/imported/Default_Top.glb-00d4fe98058a47a41afd4e25b2654c29.scn"]
+source_file="res://Scenes/DummyTop.glb"
+dest_files=["res://.godot/imported/DummyTop.glb-31dc108370c962834378264980e22b6c.scn"]
 
 [params]
 
@@ -39,19 +39,7 @@ import_script/path=""
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
-_subresources={
-"meshes": {
-"Defult_Top_Top2_Cube_007": {
-"generate/lightmap_uv": 0,
-"generate/lods": 0,
-"generate/shadow_meshes": 0,
-"lods/normal_merge_angle": 20.0,
-"save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://Character/Default_Top.res",
-"save_to_file/path": "uid://bxnobkedx8yeo"
-}
-}
-}
+_subresources={}
 gltf/naming_version=2
 gltf/embedded_image_handling=1
 gltf/texture_map_mode=1

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://canlw72q1pqdt"]
 
-[ext_resource type="PackedScene" uid="uid://dkrugkaulvdjt" path="res://Character/mech_top.tscn" id="1_42pth"]
+[ext_resource type="PackedScene" uid="uid://dkrugkaulvdjt" path="res://Character/Mech/mech_top.tscn" id="1_42pth"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tai1n"]
 size = Vector3(7.779541, 1, 4.5273438)

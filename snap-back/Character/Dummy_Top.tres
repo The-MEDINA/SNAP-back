@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="PartOption" format=3 uid="uid://1gjbnl2kfpym"]
+
+[ext_resource type="Script" uid="uid://11cu0aac0dfw" path="res://Scripts/PartOption.gd" id="1_d3544"]
+
+[resource]
+script = ExtResource("1_d3544")
+metadata/_custom_type_script = "uid://11cu0aac0dfw"

@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="PartOption" format=3 uid="uid://bbixpfhktlsfc"]
 
 [ext_resource type="Script" uid="uid://11cu0aac0dfw" path="res://Scripts/PartOption.gd" id="1_leyip"]
-[ext_resource type="ArrayMesh" uid="uid://cmm6kcxsqqi6u" path="res://Character/Default_Bottom.res" id="1_s8oi1"]
+[ext_resource type="ArrayMesh" uid="uid://cmm6kcxsqqi6u" path="res://Character/Default/Default_Bottom.res" id="1_s8oi1"]
 
 [resource]
 script = ExtResource("1_leyip")

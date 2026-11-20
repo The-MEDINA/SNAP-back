@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://dkrugkaulvdjt"]
 
-[ext_resource type="ArrayMesh" uid="uid://b7mcau7tmylae" path="res://Assets/Models/RobotTop.res" id="1_plln3"]
-[ext_resource type="Script" uid="uid://dtl7ms133jxm4" path="res://Character/top.gd" id="1_t5tkd"]
-[ext_resource type="Script" uid="uid://r41apnu6aur8" path="res://Scripts/boneForceReceiver.gd" id="3_dvaty"]
+[ext_resource type="Script" uid="uid://dtl7ms133jxm4" path="res://Character/top.gd" id="1_w17ww"]
+[ext_resource type="ArrayMesh" uid="uid://b7mcau7tmylae" path="res://Assets/Models/RobotTop.res" id="2_ka8fc"]
+[ext_resource type="Script" uid="uid://r41apnu6aur8" path="res://Scripts/boneForceReceiver.gd" id="3_hl4dw"]
 
 [sub_resource type="Skin" id="Skin_tbgc5"]
 resource_name = "Skin"
@@ -67,7 +67,7 @@ size = Vector3(0.06838989, 0.99487305, 0.36621094)
 
 [node name="Top" type="Node3D" unique_id=1023642976]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6277708, 0)
-script = ExtResource("1_t5tkd")
+script = ExtResource("1_w17ww")
 
 [node name="ArmatureTop" type="Node3D" parent="." unique_id=401983896]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.71781665, 0)
@@ -138,7 +138,7 @@ bones/8/rotation = Quaternion(-0.027036693, 0.080917284, -0.08834129, 0.99243)
 bones/8/scale = Vector3(0.99999994, 1, 0.9999999)
 
 [node name="TopMesh" type="MeshInstance3D" parent="ArmatureTop/Skeleton3D" unique_id=1863962661]
-mesh = ExtResource("1_plln3")
+mesh = ExtResource("2_ka8fc")
 skin = SubResource("Skin_tbgc5")
 skeleton = NodePath("..")
 
@@ -149,7 +149,7 @@ transform = Transform3D(1, 2.3841858e-07, 1.9187581e-17, 5.756275e-17, -1.609571
 joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1982794e-19, 5.023846e-13, 0.22763795)
 body_offset = Transform3D(1, 0, -3.3087225e-24, 0, 0, -1, 0, 1, 0, 1.1982869e-19, 0.22763795, -5.023846e-13)
 bone_name = "Torso"
-script = ExtResource("3_dvaty")
+script = ExtResource("3_hl4dw")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D/Physical Bone RootTorso" unique_id=184099452]
 transform = Transform3D(1, 3.3087225e-24, 0, 0, 0, 1, 0, -1, 0, -0.008850098, 0.003509519, -0.00012207031)
@@ -169,7 +169,7 @@ joint_constraints/twist_span = 90.0
 joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
-script = ExtResource("3_dvaty")
+script = ExtResource("3_hl4dw")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D/Physical Bone Neck" unique_id=1189762254]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
@@ -184,7 +184,7 @@ bone_name = "ShoulderL"
 joint_constraints/bias = 0.3
 joint_constraints/damping = 1.0
 joint_constraints/impulse_clamp = 0.0
-script = ExtResource("3_dvaty")
+script = ExtResource("3_hl4dw")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D/Physical Bone ShoulderL" unique_id=1280171300]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
@@ -201,7 +201,7 @@ joint_constraints/twist_span = 180.0
 joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
-script = ExtResource("3_dvaty")
+script = ExtResource("3_hl4dw")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D/Physical Bone UpperArmL" unique_id=1141605938]
 transform = Transform3D(0.99234694, 0.12347468, -0.0013910532, -0.0013910085, 0.02244194, 0.9997471, 0.123474695, -0.992094, 0.02244193, -0.036526024, -0.006638713, -0.016480327)
@@ -218,7 +218,7 @@ joint_constraints/twist_span = 180.0
 joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
-script = ExtResource("3_dvaty")
+script = ExtResource("3_hl4dw")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D/Physical Bone ShoulderR" unique_id=1188782044]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
@@ -233,21 +233,21 @@ bone_name = "UpperArmR"
 joint_constraints/bias = 0.3
 joint_constraints/damping = 1.0
 joint_constraints/impulse_clamp = 0.0
-script = ExtResource("3_dvaty")
+script = ExtResource("3_hl4dw")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D/Physical Bone UpperArmR" unique_id=892882795]
 transform = Transform3D(0.9847835, 0.17367919, 0.0060484707, 0.0060483217, -0.06903774, 0.99759555, 0.17367925, -0.98237956, -0.06903782, -0.026973307, 0.010721922, -0.072878)
 shape = SubResource("CapsuleShape3D_3ip7v")
 
 [node name="Physical Bone ForearmR" type="PhysicalBone3D" parent="ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D" unique_id=2104103588]
-script = ExtResource("3_dvaty")
+script = ExtResource("3_hl4dw")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D/Physical Bone ForearmR" unique_id=148645584]
 transform = Transform3D(0.97109157, 0.23870717, 0, -0.23870717, 0.97109157, 0, 0, 0, 1, -0.44818646, -0.2557828, 0)
 shape = SubResource("CylinderShape3D_d6c0n")
 
 [node name="Physical Bone ForearmL" type="PhysicalBone3D" parent="ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D" unique_id=1756729748]
-script = ExtResource("3_dvaty")
+script = ExtResource("3_hl4dw")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ArmatureTop/Skeleton3D/PhysicalBoneSimulator3D/Physical Bone ForearmL" unique_id=136261382]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5260448, 0.0025634766, 0.0024414063)
